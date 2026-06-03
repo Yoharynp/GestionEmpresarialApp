@@ -1,0 +1,146 @@
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary-color);
+    min-height: 100vh;
+}
+
+.main-left, .main-right {
+    flex: 1;
+    padding: 2rem;
+}
+
+.main-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-left h1 {
+    width: 70%;
+    text-align: center;
+    font-size: 3rem;
+}
+
+.main-left p {
+    width: 70%;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-block: 1rem;
+    font-weight: 500;
+}
+
+.main-left form {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-block: 0.2rem;
+}
+.form-group label {
+    font-weight: 700;
+}
+.form-group input {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.main-left button {
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.main-left button:hover {
+    background-color: #1a3db8;
+    transform: translateY(0.2rem);
+}
+
+.main-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-inline: 2rem;
+    background-color: #134490;
+    min-height: 100vh;
+}
+
+.main-right h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+p.main-right-subtitle{
+    font-size: 3rem;
+}
+
+.main-right p {
+    color: #AEC5E7;
+    font-size: 1rem;
+    text-align: center;
+    width: 90%;
+}
+
+.main-right-cards {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.main-right-card {
+    background-color: #1D4ED8;
+    color: white;
+    padding-block: 2rem;
+    padding-inline: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+    padding-inline: 2rem;
+    gap: 1rem;
+    flex: 1;
+    border: 0.2rem solid transparent;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.main-right-card:hover {
+    border-color: #AEC5E7;
+    transform: translateY(-0.2rem);
+}
+
+
+.main-right-card-icon {
+    width: 5rem;
+}
+
+@media (max-width: 800px) {
+    .main-right {
+        display: none;
+    }
+}

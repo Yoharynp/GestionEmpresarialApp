@@ -1,0 +1,27 @@
+# Build outputs
+bin/
+obj/
+out/
+publish/
+
+# Visual Studio / IDE metadata
+.vs/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.rsuser
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.cache
+TestResults/
+
+# Local configuration and secrets
+.env
+.env.*
+appsettings.*.local.json
+secrets.json
+secrets.*

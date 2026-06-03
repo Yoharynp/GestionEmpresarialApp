@@ -1,0 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+  --primary-color: #1D4ED8;
+  --secondary-color: #F9F7F2;
+  --tertiary-color: #8BA89E;
+  --neutral-color: #424242
+}
+
+h1 {
+  font-family: 'Plus Jakarta Sans';
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+p {
+  font-family: 'Plus Jakarta Sans';
+  font-weight: 400;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans';
+  background-color: var(--secondary-color);
+  color: var(--neutral-color);
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('/fonts/PlusJakartaSans-VariableFont_wght.ttf') format('truetype-variations'),
+         url('/fonts/PlusJakartaSans-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('/fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf') format('truetype-variations'),
+         url('/fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 800;
+    font-style: italic;
+}
