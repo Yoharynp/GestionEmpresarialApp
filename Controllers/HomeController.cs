@@ -15,6 +15,15 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        var user = HttpContext.Session.GetString("Username");
+        var rol = HttpContext.Session.GetString("Role");
+        if (string.IsNullOrEmpty(user))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        ViewBag.Username = user;
+        ViewBag.Rol = rol;
         return View();
     }
 
