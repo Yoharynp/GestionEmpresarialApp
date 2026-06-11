@@ -1,52 +1,151 @@
-@{ Layout = null;}
+@{ Layout = null; }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="/css/site.css">
-    <link rel="stylesheet" href="/css/login.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Control de Acceso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/css/login.css")" />
 </head>
 <body>
-    <div class="main" >
-        <div class="main-left">
-            <h1>Sistema de Control de Acceso</h1>
-            <p>Ingrese sus credenciales</p>
-            <form method="post" action="/Account/Login">
-                <div class="form-group">
-                    <label for="username">Usuario</label>
-                    <input type="text" id="username" name="username" required placeholder="Ingrese su usuario">
+    <div class="login-container">
+
+        <section class="login-left">
+            <div class="login-form-box">
+
+                <div class="login-header">
+                    <h1>Sistema de Control <br /> de Acceso</h1>
+                    <p>Ingrese sus credenciales</p>
                 </div>
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required placeholder="*************">
+
+                <form method="post" action="/Account/Login" class="login-form">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="login-error">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <div class="form-field">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" name="username" placeholder="Usuario" autocomplete="username" value="@(ViewBag.Username ?? "")" />
+                        <span class="login-field-error" id="err-username"></span>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••••" autocomplete="current-password" />
+                        <span class="login-field-error" id="err-password"></span>
+                    </div>
+
+                    <div class="login-actions">
+                        <button type="submit" class="btn-submit" id="btn-login">Iniciar Sesión</button>
+                        <button type="button" class="btn-exit" onclick="window.close()">Salir</button>
+                    </div>
+
+                </form>
+
+                <div class="credentials-box">
+                    <p>Credenciales de prueba:</p>
+                    <div class="credentials-list">
+                        <span><strong>admin</strong> — 12345</span>
+                        <span><strong>supervisor</strong> — 12345</span>
+                        <span><strong>ejecutor</strong> — 12345</span>
+                    </div>
                 </div>
-                <button type="submit">Iniciar Sesión</button>
-            </form>
-        </div>
-        <div class="main-right">
-            <h1>Control de Acceso Empresarial</h1>
-            <p class="main-right-subtitle" >Sistema integral de gestión de usuarios, roles y permisos con validación de credenciales y registro de auditoría</p>
-            <div class="main-right-cards">
-                <div class="main-right-card">
-                    <img src="/images/users.svg" alt="Gestión de Usuarios" class="main-right-card-icon">
-                    <h2>Gestión de Usuarios</h2>
-                    <p>Administre usuarios, roles y permisos de manera eficiente</p>
+
+            </div>
+        </section>
+
+        <section class="login-right">
+            <div class="dots dots-top-right"></div>
+            <div class="dots dots-bottom-left"></div>
+            <div class="dots dots-left-mid"></div>
+            <div class="right-glow"></div>
+
+            <div class="right-content">
+                <div class="right-heading">
+                    <h2>Control de Acceso Empresarial</h2>
+                    <p>Sistema integral de gestión de usuarios, roles y permisos con validación de credenciales y registro de auditoría.</p>
                 </div>
-                <div class="main-right-card">
-                    <img src="/images/rols.svg" alt="Control de Roles" class="main-right-card-icon">
-                    <h2>Control de Roles</h2>
-                    <p>Asignación y gestión de permisos por rol</p>
-                </div>
-                <div class="main-right-card">
-                    <img src="/images/audit.svg" alt="Registro de Auditoría" class="main-right-card-icon">
-                    <h2>Registro de Auditoría</h2>
-                    <p>Registro completo de accesos y operaciones</p>
+
+                <div class="feature-cards">
+                    <article class="feature-card">
+                        <div class="feature-card-icon">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <h3>Gestión de Usuarios</h3>
+                        <p>Administración completa de usuarios del sistema</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card-icon">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                                <polyline points="2 12 12 17 22 12" />
+                                <polyline points="2 17 12 22 22 17" />
+                            </svg>
+                        </div>
+                        <h3>Control de Roles</h3>
+                        <p>Asignación y gestión de permisos por rol</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card-icon">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <rect height="4" rx="1" ry="1" width="8" x="8" y="2" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m9 14 2 2 4-4" />
+                            </svg>
+                        </div>
+                        <h3>Auditoría</h3>
+                        <p>Registro completo de accesos y operaciones</p>
+                    </article>
                 </div>
             </div>
-        </div>
+        </section>
+
     </div>
+<script>
+    document.getElementById('btn-login').closest('form').addEventListener('submit', function(e) {
+        var ok = true;
+
+        var u = document.getElementById('username');
+        var errU = document.getElementById('err-username');
+        if (!u.value.trim()) {
+            errU.textContent = 'El usuario es requerido';
+            u.style.boxShadow = '0 0 0 2px #F87171';
+            ok = false;
+        } else {
+            errU.textContent = '';
+            u.style.boxShadow = '';
+        }
+
+        var p = document.getElementById('password');
+        var errP = document.getElementById('err-password');
+        if (!p.value) {
+            errP.textContent = 'La contraseña es requerida';
+            p.style.boxShadow = '0 0 0 2px #F87171';
+            ok = false;
+        } else {
+            errP.textContent = '';
+            p.style.boxShadow = '';
+        }
+
+        if (!ok) e.preventDefault();
+    });
+</script>
 </body>
 </html>

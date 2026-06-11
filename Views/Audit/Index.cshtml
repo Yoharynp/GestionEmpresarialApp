@@ -1,0 +1,165 @@
+@model IEnumerable<GestionEmpresarialApp.Models.AuditLog>
+@{
+    ViewData["Title"] = "Logs de Acceso";
+    var filterAction = ViewBag.FilterAction as string ?? "";
+    var filterResult = ViewBag.FilterResult as string ?? "";
+    var filterFrom   = ViewBag.FilterFrom   as string ?? "";
+    var filterTo     = ViewBag.FilterTo     as string ?? "";
+}
+
+<div class="page-top-row">
+    <div class="page-header page-header-green" style="margin-bottom: 0;">
+        <div class="page-header-accent"></div>
+        <h3>Logs de Acceso</h3>
+        <p>Registro de actividad del sistema</p>
+    </div>
+    <a href="@Url.Action("Export", new { action = filterAction, result = filterResult, from = filterFrom, to = filterTo })"
+       class="btn-export">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        Exportar CSV
+    </a>
+</div>
+
+<div class="table-container green" style="margin-top: 1.5rem;">
+
+    <form method="get" action="@Url.Action("Index")">
+        <div class="table-toolbar">
+            <div class="search-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <input type="text" id="search-logs" class="search-input" placeholder="Filtrar tabla por usuario, acción o IP...">
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Acción</label>
+                <select name="action">
+                    <option value="">Todas</option>
+                    @foreach (var opt in new[] {
+                        new { Val = "LOGIN",        Label = "Login" },
+                        new { Val = "LOGIN_FAILED", Label = "Login Fallido" },
+                        new { Val = "LOGOUT",       Label = "Logout" },
+                        new { Val = "CREATE_USER",  Label = "Crear Usuario" },
+                        new { Val = "EDIT_USER",    Label = "Editar Usuario" },
+                        new { Val = "DELETE_USER",  Label = "Eliminar Usuario" },
+                    })
+                    {
+                        if (filterAction == opt.Val)
+                        {
+                            <option value="@opt.Val" selected>@opt.Label</option>
+                        }
+                        else
+                        {
+                            <option value="@opt.Val">@opt.Label</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Resultado</label>
+                <select name="result">
+                    <option value="">Todos</option>
+                    @if (filterResult == "SUCCESS")
+                    {
+                        <option value="SUCCESS" selected>Exitoso</option>
+                        <option value="FAILED">Fallido</option>
+                    }
+                    else if (filterResult == "FAILED")
+                    {
+                        <option value="SUCCESS">Exitoso</option>
+                        <option value="FAILED" selected>Fallido</option>
+                    }
+                    else
+                    {
+                        <option value="SUCCESS">Exitoso</option>
+                        <option value="FAILED">Fallido</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Desde</label>
+                <input type="date" name="from" value="@filterFrom">
+            </div>
+            <div class="filter-group">
+                <label>Hasta</label>
+                <input type="date" name="to" value="@filterTo">
+            </div>
+            <div class="filter-group" style="justify-content: flex-end;">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn-save" style="margin-top: auto;">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div style="overflow-x: auto;">
+        <table class="data-table" id="logs-table">
+            <thead>
+                <tr>
+                    <th>Fecha/Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Resultado</th>
+                    <th>IP</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td class="font-mono">@log.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>@log.Username</td>
+                        <td>@log.Action</td>
+                        <td>
+                            @if (log.Result == "SUCCESS")
+                            {
+                                <span class="status-badge success">Exitoso</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge error">Fallido</span>
+                            }
+                        </td>
+                        <td class="font-mono">@(log.IpAddress ?? "-")</td>
+                        <td style="color: var(--gray-600);">@(log.Target ?? "-")</td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">Sin registros para los filtros seleccionados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-footer">
+        <div class="table-footer-accent"></div>
+        <span id="count-label">Mostrando <strong>@Model.Count()</strong> registros</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var searchInput = document.getElementById('search-logs');
+        var rows = document.querySelectorAll('#logs-table tbody tr');
+
+        searchInput.addEventListener('input', function () {
+            var term = this.value.toLowerCase();
+            var visible = 0;
+            rows.forEach(function (row) {
+                var text = row.textContent.toLowerCase();
+                var show = !term || text.includes(term);
+                row.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            document.getElementById('count-label').innerHTML =
+                'Mostrando <strong>' + visible + '</strong> de <strong>' + rows.length + '</strong> registros';
+        });
+    </script>
+}

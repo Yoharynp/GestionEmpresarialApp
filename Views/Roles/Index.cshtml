@@ -1,0 +1,168 @@
+@model IEnumerable<GestionEmpresarialApp.Models.Rol>
+@{
+    ViewData["Title"] = "Roles y Permisos";
+
+    var allPermissions = new[]
+    {
+        new { Id = "users.view",    Name = "Ver Usuarios",            Desc = "Permite visualizar la lista de usuarios",          Category = "Usuarios" },
+        new { Id = "users.create",  Name = "Crear Usuarios",          Desc = "Permite crear nuevos usuarios",                    Category = "Usuarios" },
+        new { Id = "users.edit",    Name = "Modificar Usuarios",      Desc = "Permite editar información de usuarios",           Category = "Usuarios" },
+        new { Id = "users.delete",  Name = "Eliminar Usuarios",       Desc = "Permite eliminar usuarios del sistema",            Category = "Usuarios" },
+        new { Id = "roles.view",    Name = "Ver Roles",               Desc = "Permite visualizar roles y permisos",              Category = "Roles" },
+        new { Id = "roles.edit",    Name = "Modificar Roles",         Desc = "Permite editar permisos por rol",                  Category = "Roles" },
+        new { Id = "audit.view",    Name = "Ver Logs",                Desc = "Permite visualizar los logs de acceso",            Category = "Auditoría" },
+        new { Id = "audit.export",  Name = "Exportar Logs",           Desc = "Permite exportar logs a CSV",                     Category = "Auditoría" },
+    };
+
+    var categories   = allPermissions.Select(p => p.Category).Distinct().ToList();
+    var firstRol     = Model.FirstOrDefault();
+    var firstRolId   = firstRol?.RolId ?? 0;
+    var firstPerms   = firstRol?.RolePermissions.Select(rp => rp.Permission).ToHashSet() ?? new HashSet<string>();
+    bool canEdit     = ViewBag.CanEdit == true;
+    bool isAdmin     = ViewBag.IsAdmin == true;
+}
+
+<div class="page-header page-header-purple">
+    <div class="page-header-accent"></div>
+    <h3>Gestión de Roles y Permisos</h3>
+    <p>Configure los permisos por rol</p>
+</div>
+
+<div class="roles-grid" style="margin-top: 1.5rem;">
+
+    <div class="role-list-card">
+        <div class="role-list-header">
+            <h4>Roles del Sistema</h4>
+        </div>
+        @foreach (var rol in Model)
+        {
+            var permsCount = rol.RolePermissions.Count;
+            <div class="role-item @(rol == firstRol ? "selected" : "")"
+                 data-rol-id="@rol.RolId"
+                 onclick="selectRole(this, @rol.RolId, '@rol.NombreRol')">
+                <div class="role-item-top">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                    <h5>@rol.NombreRol</h5>
+                </div>
+                <p style="margin-bottom: 0.25rem; padding-left: 2rem; font-size: 0.8rem; color: var(--gray-600);">@(rol.Description ?? "Sin descripción")</p>
+                <p style="color: var(--gray-500); font-size: 0.75rem; padding-left: 2rem;">@permsCount permisos asignados — @rol.Usuarios.Count usuarios</p>
+            </div>
+        }
+    </div>
+
+    <div class="role-permissions-panel">
+        <form id="perms-form" method="post" action="@Url.Action("SavePermissions")">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="rolId" id="input-rol-id" value="@firstRolId">
+
+            <div class="role-permissions-header">
+                <div class="role-permissions-header-accent"></div>
+                <h4 id="panel-title">Permisos: @(firstRol?.NombreRol ?? "")</h4>
+                <p id="panel-desc" style="margin-top: 0.25rem; font-size: 0.8rem; color: var(--gray-500);">@(firstRol?.Description ?? "")</p>
+            </div>
+
+            <div class="role-permissions-body">
+                @foreach (var category in categories)
+                {
+                    <div class="permission-category">
+                        <h5>@category</h5>
+                        @foreach (var perm in allPermissions.Where(p => p.Category == category))
+                        {
+                            <label class="permission-item">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox"
+                                           class="perm-check"
+                                           name="permissions"
+                                           value="@perm.Id"
+                                           data-perm="@perm.Id"
+                                           @(firstPerms.Contains(perm.Id) ? "checked" : "")
+                                           @(!canEdit ? "disabled" : "")>
+                                    <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p style="font-weight: 600; color: var(--gray-900); margin-bottom: 0.1rem;">@perm.Name</p>
+                                    <p style="font-size: 0.8rem; color: var(--gray-500);">@perm.Desc</p>
+                                </div>
+                            </label>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="role-permissions-footer">
+                <div class="role-permissions-footer-accent"></div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <p>Permisos activos: <strong style="color: var(--purple-600);" id="perm-count">@firstPerms.Count</strong> de @allPermissions.Length</p>
+                    @{
+                        var firstIsAdmin = firstRol?.NombreRol == "Administrador";
+                        var initialReadOnly = !canEdit || (firstIsAdmin && !isAdmin);
+                    }
+                    <button type="submit" id="btn-save-perms" class="btn-save" style="background-color: var(--purple-600); @(initialReadOnly ? "display:none;" : "")">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z M17 3v4H7V3 M7 13h10m-5-4v8" />
+                        </svg>
+                        Guardar Permisos
+                    </button>
+                    <span id="readonly-note" style="font-size: 0.8rem; color: var(--gray-500); font-style: italic; @(!initialReadOnly ? "display:none;" : "")">Solo lectura</span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var canEdit  = @(canEdit ? "true" : "false");
+        var isAdmin  = @(isAdmin ? "true" : "false");
+        var roleData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.ToDictionary(
+                r => r.RolId.ToString(),
+                r => new {
+                    name  = r.NombreRol,
+                    desc  = r.Description ?? "",
+                    perms = r.RolePermissions.Select(rp => rp.Permission).ToArray()
+                }
+            )
+        ));
+
+        function selectRole(el, rolId, rolName) {
+            document.querySelectorAll('.role-item').forEach(r => r.classList.remove('selected'));
+            el.classList.add('selected');
+
+            document.getElementById('input-rol-id').value = rolId;
+            document.getElementById('panel-title').textContent = 'Permisos: ' + rolName;
+
+            var data = roleData[rolId.toString()];
+            document.getElementById('panel-desc').textContent = data ? data.desc : '';
+
+            var perms = data ? data.perms : [];
+            var isAdminRole = data ? data.name === 'Administrador' : false;
+            var readOnly = !canEdit || (isAdminRole && !isAdmin);
+
+            document.querySelectorAll('.perm-check').forEach(cb => {
+                cb.checked  = perms.includes(cb.dataset.perm);
+                cb.disabled = readOnly;
+            });
+
+            var saveBtn  = document.getElementById('btn-save-perms');
+            var readNote = document.getElementById('readonly-note');
+            if (saveBtn)  saveBtn.style.display  = readOnly ? 'none'   : '';
+            if (readNote) readNote.style.display  = readOnly ? 'inline' : 'none';
+
+            updateCount();
+        }
+
+        function updateCount() {
+            var count = document.querySelectorAll('.perm-check:checked').length;
+            document.getElementById('perm-count').textContent = count;
+        }
+
+        document.querySelectorAll('.perm-check').forEach(cb => {
+            cb.addEventListener('change', updateCount);
+        });
+    </script>
+}
