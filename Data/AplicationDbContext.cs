@@ -11,6 +11,8 @@ namespace GestionEmpresarialApp.Data
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Rol> Roles { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +20,12 @@ namespace GestionEmpresarialApp.Data
 
             modelBuilder.Entity<Rol>().ToTable("roles");
             modelBuilder.Entity<Usuario>().ToTable("usuarios");
+            modelBuilder.Entity<AuditLog>().ToTable("audit_logs");
+            modelBuilder.Entity<RolePermission>().ToTable("role_permissions");
+
+            modelBuilder.Entity<RolePermission>()
+                .HasIndex(rp => new { rp.RolId, rp.Permission })
+                .IsUnique();
         }
     }
 }

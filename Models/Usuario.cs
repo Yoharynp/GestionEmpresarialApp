@@ -25,6 +25,24 @@ namespace GestionEmpresarialApp.Models
         [Column("rol_id")]
         public int RolId { get; set; }
 
+        [Column("full_name")]
+        [StringLength(100)]
+        public string? FullName { get; set; }
+
+        [Column("email")]
+        [StringLength(150)]
+        public string? Email { get; set; }
+
+        [Column("status")]
+        [StringLength(20)]
+        public string Status { get; set; } = "activo";
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Column("last_login_at")]
+        public DateTime? LastLoginAt { get; set; }
+
         [ForeignKey("RolId")]
         public virtual Rol Rol { get; set; } = null!;
     }

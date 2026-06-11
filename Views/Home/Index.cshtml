@@ -1,8 +1,149 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using GestionEmpresarialApp.Models
+@{
+    ViewData["Title"] = "Panel Principal";
+    var username     = ViewBag.Username as string ?? "Usuario";
+    var role         = ViewBag.Rol as string ?? "";
+    var totalUsers   = (int)(ViewBag.TotalUsers ?? 0);
+    var totalRoles   = (int)(ViewBag.TotalRoles ?? 0);
+    var accessesToday = (int)(ViewBag.AccessesToday ?? 0);
+    var failedToday  = (int)(ViewBag.FailedToday ?? 0);
+    var recentLogs   = ViewBag.RecentLogs as List<AuditLog> ?? new List<AuditLog>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="page-header">
+    <div class="page-header-accent"></div>
+    <h3>Bienvenido, @username</h3>
+    <p>Resumen del sistema de control de acceso</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card border-blue">
+        <div class="stat-card-bg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+            </svg>
+        </div>
+        <div class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+        </div>
+        <div class="stat-value">@totalUsers</div>
+        <div class="stat-label">Usuarios Registrados</div>
+        <div class="stat-change">Total en el sistema</div>
+    </div>
+
+    <div class="stat-card border-purple">
+        <div class="stat-card-bg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6" />
+            </svg>
+        </div>
+        <div class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+        </div>
+        <div class="stat-value">@totalRoles</div>
+        <div class="stat-label">Roles Configurados</div>
+        <div class="stat-change">Total en el sistema</div>
+    </div>
+
+    <div class="stat-card border-green">
+        <div class="stat-card-bg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+        </div>
+        <div class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+        </div>
+        <div class="stat-value">@accessesToday</div>
+        <div class="stat-label">Accesos Hoy</div>
+        <div class="stat-change">Logins exitosos del día</div>
+    </div>
+
+    <div class="stat-card border-red">
+        <div class="stat-card-bg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+        </div>
+        <div class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+        </div>
+        <div class="stat-value">@failedToday</div>
+        <div class="stat-label">Intentos Fallidos Hoy</div>
+        <div class="stat-change">Credenciales incorrectas</div>
+    </div>
+</div>
+
+<div class="content-grid">
+    <div class="content-card">
+        <div class="content-card-left-accent"></div>
+        <div class="content-card-header">
+            <h4>Actividad Reciente</h4>
+            <div class="content-card-header-underline"></div>
+        </div>
+        <div class="content-card-body">
+            @if (!recentLogs.Any())
+            {
+                <p style="color: var(--gray-500); font-size: 0.875rem; padding: 0.5rem 0;">Sin actividad registrada.</p>
+            }
+            @foreach (var log in recentLogs)
+            {
+                <div class="activity-item">
+                    <div>
+                        <div class="activity-user">@log.Username</div>
+                        <div class="activity-action">@log.Action@(log.Target != null ? $" — {log.Target}" : "")</div>
+                    </div>
+                    <div class="activity-time">
+                        <div>@log.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                        @if (log.Result == "SUCCESS")
+                        {
+                            <div class="badge-success">Exitoso</div>
+                        }
+                        else
+                        {
+                            <div class="badge-error">Fallido</div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="content-card-right-accent"></div>
+        <div class="content-card-header">
+            <h4>Información de Sesión</h4>
+            <div class="content-card-header-underline" style="background-color: var(--purple-600);"></div>
+        </div>
+        <div class="content-card-body">
+            <div class="session-item">
+                <div class="session-item-accent"></div>
+                <span class="session-label">Usuario</span>
+                <span class="session-value">@username</span>
+            </div>
+            <div class="session-item">
+                <div class="session-item-accent"></div>
+                <span class="session-label">Rol</span>
+                <span class="session-value">@role</span>
+            </div>
+            <div class="session-item">
+                <div class="session-item-accent"></div>
+                <span class="session-label">Estado</span>
+                <span class="session-value status-active">Activo</span>
+            </div>
+            <div class="session-item">
+                <div class="session-item-accent"></div>
+                <span class="session-label">Fecha de Acceso</span>
+                <span class="session-value">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+        </div>
+    </div>
 </div>
