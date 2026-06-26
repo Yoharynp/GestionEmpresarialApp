@@ -1,0 +1,298 @@
+@model IEnumerable<GestionEmpresarialApp.Models.Client>
+@{
+    ViewData["Title"] = "Clientes";
+    bool canCreate  = ViewBag.CanCreate == true;
+    bool canEdit    = ViewBag.CanEdit   == true;
+    bool canDelete  = ViewBag.CanDelete == true;
+    string search   = ViewBag.Search ?? "";
+    var urlCreate   = Url.Action("Create") ?? "/Clients/Create";
+    var urlEdit     = Url.Action("Edit")   ?? "/Clients/Edit";
+    var urlIndex    = Url.Action("Index")  ?? "/Clients";
+}
+
+<div class="page-top-row">
+    <div class="page-header" style="margin-bottom: 0;">
+        <div class="page-header-accent"></div>
+        <h3>Gestión de Clientes</h3>
+        <p>Administre los clientes del sistema</p>
+    </div>
+    @if (canCreate)
+    {
+        <button type="button" class="btn-new" onclick="openForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nuevo Cliente
+        </button>
+    }
+</div>
+
+@if (ViewBag.FormError != null)
+{
+    <div class="form-error-banner">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+        @ViewBag.FormError
+    </div>
+}
+
+<div class="inline-form-panel" id="inline-form" style="display:none;">
+    <div class="form-panel">
+        <div class="form-panel-top-accent"></div>
+        <div class="form-panel-header">
+            <h4 class="form-panel-title" id="form-title">Nuevo Cliente</h4>
+            <button type="button" class="btn-icon" onclick="closeForm()" title="Cerrar">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="client-form" method="post" action="@urlCreate">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="form-client-id" name="ClientId" value="0">
+            <input type="hidden" id="form-created-at" name="CreatedAt" value="">
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="form-group">
+                    <label for="field-firstname">Nombre *</label>
+                    <input type="text" id="field-firstname" name="FirstName" placeholder="Juan">
+                    <span class="field-error" id="err-firstname"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="field-lastname">Apellido *</label>
+                    <input type="text" id="field-lastname" name="LastName" placeholder="Pérez">
+                    <span class="field-error" id="err-lastname"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="field-phone">Teléfono</label>
+                    <input type="text" id="field-phone" name="Phone" placeholder="(809)-000-0000" data-phone maxlength="14">
+                </div>
+
+                <div class="form-group">
+                    <label for="field-email">Email</label>
+                    <input type="email" id="field-email" name="Email" placeholder="cliente@@empresa.com">
+                    <span class="field-error" id="err-email"></span>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="field-address">Dirección</label>
+                    <input type="text" id="field-address" name="Address" placeholder="Calle, No., Ciudad">
+                </div>
+
+                <div class="form-group">
+                    <label for="field-status">Estado</label>
+                    <select id="field-status" name="Status">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save" id="btn-submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z M17 3v4H7V3 M7 13h10m-5-4v8" />
+                    </svg>
+                    <span id="btn-label">Crear Cliente</span>
+                </button>
+                <button type="button" class="btn-cancel" onclick="closeForm()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-container" style="margin-top: 1.5rem;">
+    <div class="table-toolbar">
+        <form method="get" action="@urlIndex">
+            <div class="search-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <input type="text" name="search" value="@search" class="search-input" placeholder="Buscar por nombre, apellido, email o teléfono...">
+            </div>
+        </form>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    @if (canEdit || canDelete)
+                    {
+                        <th>Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    var cPhone   = c.Phone    ?? string.Empty;
+                    var cEmail   = c.Email    ?? string.Empty;
+                    var cAddress = c.Address  ?? string.Empty;
+                    var cCreated = c.CreatedAt.ToString("o");
+                    var cDeleteUrl = Url.Action("Delete", new { id = c.ClientId });
+                    <tr>
+                        <td>@c.FirstName</td>
+                        <td>@c.LastName</td>
+                        <td style="color: var(--gray-600);">@(cPhone   == string.Empty ? "-" : cPhone)</td>
+                        <td style="color: var(--gray-600);">@(cEmail   == string.Empty ? "-" : cEmail)</td>
+                        <td style="color: var(--gray-600);">@(cAddress == string.Empty ? "-" : cAddress)</td>
+                        <td>
+                            @if (c.Status == "activo")
+                            {
+                                <span class="status-badge active">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge inactive">Inactivo</span>
+                            }
+                        </td>
+                        @if (canEdit || canDelete)
+                        {
+                            <td>
+                                @if (canEdit)
+                                {
+                                    <button type="button" class="btn-table-action edit" title="Editar"
+                                        onclick="openEdit(@c.ClientId, '@c.FirstName', '@c.LastName', '@cPhone', '@cEmail', '@cAddress', '@c.Status', '@cCreated')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                                        </svg>
+                                    </button>
+                                }
+                                @if (canDelete)
+                                {
+                                    <form method="post" action="@cDeleteUrl" style="display:inline;"
+                                          onsubmit="return confirm('¿Eliminar cliente @c.FirstName @c.LastName?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-table-action delete" title="Eliminar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 2rem; color: var(--gray-500);">Sin clientes para mostrar.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-footer">
+        Mostrando @Model.Count() clientes
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var formEl    = document.getElementById('inline-form');
+        var formTag   = document.getElementById('client-form');
+        var titleEl   = document.getElementById('form-title');
+        var btnLabel  = document.getElementById('btn-label');
+        var isEditMode = false;
+
+        function openForm() {
+            isEditMode = false;
+            formTag.action           = '@urlCreate';
+            titleEl.textContent      = 'Nuevo Cliente';
+            btnLabel.textContent     = 'Crear Cliente';
+            document.getElementById('form-client-id').value  = '0';
+            document.getElementById('form-created-at').value = '';
+            document.getElementById('field-firstname').value = '';
+            document.getElementById('field-lastname').value  = '';
+            document.getElementById('field-phone').value     = '';
+            document.getElementById('field-email').value     = '';
+            document.getElementById('field-address').value   = '';
+            document.getElementById('field-status').value    = 'activo';
+            clearErrors();
+            showPanel();
+        }
+
+        function openEdit(id, firstName, lastName, phone, email, address, status, createdAt) {
+            isEditMode = true;
+            formTag.action           = '@urlEdit';
+            titleEl.textContent      = 'Editar Cliente';
+            btnLabel.textContent     = 'Guardar Cambios';
+            document.getElementById('form-client-id').value  = id;
+            document.getElementById('form-created-at').value = createdAt;
+            document.getElementById('field-firstname').value = firstName;
+            document.getElementById('field-lastname').value  = lastName;
+            document.getElementById('field-phone').value     = phone;
+            document.getElementById('field-email').value     = email;
+            document.getElementById('field-address').value   = address;
+            document.getElementById('field-status').value    = status;
+            clearErrors();
+            showPanel();
+        }
+
+        function showPanel() {
+            formEl.style.display = 'block';
+            formEl.classList.remove('panel-closing');
+            formEl.classList.add('panel-open');
+            formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeForm() {
+            formEl.classList.remove('panel-open');
+            formEl.classList.add('panel-closing');
+            setTimeout(function() {
+                formEl.style.display = 'none';
+                formEl.classList.remove('panel-closing');
+            }, 350);
+        }
+
+        function setError(fieldId, errId, msg) {
+            var f = document.getElementById(fieldId);
+            var e = document.getElementById(errId);
+            if (e) e.textContent = msg;
+            if (f) f.style.borderColor = msg ? 'var(--red-600)' : '';
+        }
+
+        function clearErrors() {
+            ['err-firstname','err-lastname','err-email'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+            ['field-firstname','field-lastname','field-email'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.style.borderColor = '';
+            });
+        }
+
+        formTag.addEventListener('submit', function(e) {
+            clearErrors();
+            var ok = true;
+
+            var firstName = document.getElementById('field-firstname').value.trim();
+            if (!firstName) { setError('field-firstname', 'err-firstname', 'El nombre es requerido'); ok = false; }
+
+            var lastName = document.getElementById('field-lastname').value.trim();
+            if (!lastName) { setError('field-lastname', 'err-lastname', 'El apellido es requerido'); ok = false; }
+
+            var email = document.getElementById('field-email').value.trim();
+            if (email) {
+                var re = new RegExp('^[^\\s@@]+@@[^\\s@@]+\\.[^\\s@@]+$');
+                if (!re.test(email)) { setError('field-email', 'err-email', 'Email inválido'); ok = false; }
+            }
+
+            if (!ok) e.preventDefault();
+        });
+    </script>
+}

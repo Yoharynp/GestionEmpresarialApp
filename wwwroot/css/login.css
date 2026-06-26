@@ -450,8 +450,27 @@ body {
         width: 100%;
         padding: 3rem 2rem;
     }
-
     .login-right {
         display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-left {
+        padding: 2rem 1.25rem;
+    }
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+    .login-actions {
+        flex-direction: column;
+    }
+    .btn-submit,
+    .btn-exit {
+        width: 100%;
+    }
+    .credentials-list {
+        flex-direction: column;
+        gap: 0.25rem;
     }
 }

@@ -1332,37 +1332,68 @@
 
 /* Sidebar entrance + collapse transition */
 .sidebar {
-    animation: sidebarEntrance 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
     transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                 border-color 0.35s ease;
 }
-
-/* Topbar entrance */
-.topbar {
-    animation: topbarDrop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+.sidebar.sidebar-animate {
+    animation: sidebarEntrance 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Page content area */
-.page-content {
-    animation: fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+@view-transition {
+    navigation: auto;
 }
 
-/* Page header */
-.page-header {
-    animation: fadeSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
-}
+/* ── Entrance animations — only active on first login (.first-entry on body) ── */
 
-.page-top-row {
-    animation: fadeSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
-}
+.first-entry .topbar         { animation: topbarDrop  0.4s  cubic-bezier(0.22, 1, 0.36, 1) both; }
+.first-entry .page-content   { animation: fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.1s  both; }
+.first-entry .page-header    { animation: fadeSlideIn 0.4s  cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+.first-entry .page-top-row   { animation: fadeSlideIn 0.4s  cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
 
-/* Stat cards — staggered */
-.stat-card:nth-child(1) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
-.stat-card:nth-child(2) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
-.stat-card:nth-child(3) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-.stat-card:nth-child(4) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
+.first-entry .stat-card:nth-child(1) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+.first-entry .stat-card:nth-child(2) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+.first-entry .stat-card:nth-child(3) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+.first-entry .stat-card:nth-child(4) { animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
 
-/* Stat card hover — lift */
+.first-entry .content-card:nth-child(1) { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
+.first-entry .content-card:nth-child(2) { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both; }
+
+.first-entry .table-container { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+
+.first-entry .data-table tbody tr:nth-child(1)  { animation: tableRowIn 0.35s ease 0.15s both; }
+.first-entry .data-table tbody tr:nth-child(2)  { animation: tableRowIn 0.35s ease 0.2s  both; }
+.first-entry .data-table tbody tr:nth-child(3)  { animation: tableRowIn 0.35s ease 0.25s both; }
+.first-entry .data-table tbody tr:nth-child(4)  { animation: tableRowIn 0.35s ease 0.3s  both; }
+.first-entry .data-table tbody tr:nth-child(5)  { animation: tableRowIn 0.35s ease 0.35s both; }
+.first-entry .data-table tbody tr:nth-child(6)  { animation: tableRowIn 0.35s ease 0.38s both; }
+.first-entry .data-table tbody tr:nth-child(7)  { animation: tableRowIn 0.35s ease 0.41s both; }
+.first-entry .data-table tbody tr:nth-child(8)  { animation: tableRowIn 0.35s ease 0.44s both; }
+.first-entry .data-table tbody tr:nth-child(9)  { animation: tableRowIn 0.35s ease 0.47s both; }
+.first-entry .data-table tbody tr:nth-child(10) { animation: tableRowIn 0.35s ease 0.5s  both; }
+.first-entry .data-table tbody tr:nth-child(11) { animation: tableRowIn 0.35s ease 0.52s both; }
+.first-entry .data-table tbody tr:nth-child(12) { animation: tableRowIn 0.35s ease 0.54s both; }
+.first-entry .data-table tbody tr:nth-child(13) { animation: tableRowIn 0.35s ease 0.56s both; }
+.first-entry .data-table tbody tr:nth-child(14) { animation: tableRowIn 0.35s ease 0.58s both; }
+.first-entry .data-table tbody tr:nth-child(15) { animation: tableRowIn 0.35s ease 0.6s  both; }
+
+.first-entry .role-list-card       { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+.first-entry .role-permissions-panel { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
+
+.first-entry .role-item:nth-child(1) { animation: fadeSlideIn 0.35s ease 0.2s  both; }
+.first-entry .role-item:nth-child(2) { animation: fadeSlideIn 0.35s ease 0.28s both; }
+.first-entry .role-item:nth-child(3) { animation: fadeSlideIn 0.35s ease 0.36s both; }
+.first-entry .role-item:nth-child(4) { animation: fadeSlideIn 0.35s ease 0.44s both; }
+
+.first-entry .nav-btn:nth-child(1) { animation: fadeSlideIn 0.35s ease 0.1s  both; }
+.first-entry .nav-btn:nth-child(2) { animation: fadeSlideIn 0.35s ease 0.17s both; }
+.first-entry .nav-btn:nth-child(3) { animation: fadeSlideIn 0.35s ease 0.24s both; }
+.first-entry .nav-btn:nth-child(4) { animation: fadeSlideIn 0.35s ease 0.31s both; }
+.first-entry .nav-btn:nth-child(5) { animation: fadeSlideIn 0.35s ease 0.38s both; }
+.first-entry .nav-btn:nth-child(6) { animation: fadeSlideIn 0.35s ease 0.45s both; }
+
+.first-entry .sidebar-user-card { animation: fadeSlideUp 0.4s ease 0.35s both; }
+
+/* Stat card hover — always active */
 .stat-card {
     transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1371,61 +1402,9 @@
     transform: translateY(-3px);
 }
 
-/* Content cards entrance */
-.content-card:nth-child(1) { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
-.content-card:nth-child(2) { animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both; }
-
-/* Table container entrance */
-.table-container {
-    animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-}
-
-/* Table rows — staggered (up to 15 rows) */
-.data-table tbody tr:nth-child(1)  { animation: tableRowIn 0.35s ease 0.15s both; }
-.data-table tbody tr:nth-child(2)  { animation: tableRowIn 0.35s ease 0.2s  both; }
-.data-table tbody tr:nth-child(3)  { animation: tableRowIn 0.35s ease 0.25s both; }
-.data-table tbody tr:nth-child(4)  { animation: tableRowIn 0.35s ease 0.3s  both; }
-.data-table tbody tr:nth-child(5)  { animation: tableRowIn 0.35s ease 0.35s both; }
-.data-table tbody tr:nth-child(6)  { animation: tableRowIn 0.35s ease 0.38s both; }
-.data-table tbody tr:nth-child(7)  { animation: tableRowIn 0.35s ease 0.41s both; }
-.data-table tbody tr:nth-child(8)  { animation: tableRowIn 0.35s ease 0.44s both; }
-.data-table tbody tr:nth-child(9)  { animation: tableRowIn 0.35s ease 0.47s both; }
-.data-table tbody tr:nth-child(10) { animation: tableRowIn 0.35s ease 0.5s  both; }
-.data-table tbody tr:nth-child(11) { animation: tableRowIn 0.35s ease 0.52s both; }
-.data-table tbody tr:nth-child(12) { animation: tableRowIn 0.35s ease 0.54s both; }
-.data-table tbody tr:nth-child(13) { animation: tableRowIn 0.35s ease 0.56s both; }
-.data-table tbody tr:nth-child(14) { animation: tableRowIn 0.35s ease 0.58s both; }
-.data-table tbody tr:nth-child(15) { animation: tableRowIn 0.35s ease 0.6s  both; }
-
-/* Form panel — drop from top */
+/* Form panel drop — always active (triggered by JS on open) */
 .form-panel {
     animation: formPanelDrop 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
-}
-
-/* Roles grid panels */
-.role-list-card {
-    animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
-}
-
-.role-permissions-panel {
-    animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
-}
-
-/* Role items — staggered */
-.role-item:nth-child(1) { animation: fadeSlideIn 0.35s ease 0.2s  both; }
-.role-item:nth-child(2) { animation: fadeSlideIn 0.35s ease 0.28s both; }
-.role-item:nth-child(3) { animation: fadeSlideIn 0.35s ease 0.36s both; }
-.role-item:nth-child(4) { animation: fadeSlideIn 0.35s ease 0.44s both; }
-
-/* Nav buttons — staggered entrance */
-.nav-btn:nth-child(1) { animation: fadeSlideIn 0.35s ease 0.1s  both; }
-.nav-btn:nth-child(2) { animation: fadeSlideIn 0.35s ease 0.17s both; }
-.nav-btn:nth-child(3) { animation: fadeSlideIn 0.35s ease 0.24s both; }
-.nav-btn:nth-child(4) { animation: fadeSlideIn 0.35s ease 0.31s both; }
-
-/* Sidebar user card */
-.sidebar-user-card {
-    animation: fadeSlideUp 0.4s ease 0.35s both;
 }
 
 /* Button hover — save/new lift */
@@ -1458,4 +1437,123 @@
 .session-item:nth-child(2) { animation: fadeSlideUp 0.3s ease 0.37s both; }
 .session-item:nth-child(3) { animation: fadeSlideUp 0.3s ease 0.44s both; }
 .session-item:nth-child(4) { animation: fadeSlideUp 0.3s ease 0.51s both; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+/* Tablet (≤ 1024px): collapse sidebar by default */
+@media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 200;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    }
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 199;
+    }
+    .sidebar-overlay.active {
+        display: block;
+    }
+    .main-content {
+        width: 100%;
+    }
+    .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .roles-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .topbar-date {
+        display: none;
+    }
+}
+
+/* Mobile (≤ 640px): single column everywhere */
+@media (max-width: 640px) {
+    .page-content {
+        padding: 1rem;
+    }
+    .stat-cards-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+    .stat-card {
+        padding: 1rem;
+    }
+    .stat-card-value {
+        font-size: 1.5rem;
+    }
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .form-grid .form-group[style*="grid-column"] {
+        grid-column: 1 !important;
+    }
+    .page-top-row {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+    .btn-new {
+        width: 100%;
+        justify-content: center;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .btn-save,
+    .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
+    .table-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .filter-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .filter-group {
+        width: 100%;
+    }
+    .topbar h2 {
+        font-size: 0.9rem;
+    }
+    .roles-grid {
+        grid-template-columns: 1fr;
+    }
+    .permission-category {
+        padding: 0.75rem;
+    }
+    .content-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Small mobile (≤ 400px) */
+@media (max-width: 400px) {
+    .stat-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.78rem;
+    }
+}
 
