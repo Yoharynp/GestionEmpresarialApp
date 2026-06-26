@@ -10,6 +10,7 @@
 <body>
     <div class="app-shell">
         @await Html.PartialAsync("_Sidebar")
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
         <div class="main-content" id="main-content">
             <header class="topbar">
                 <button class="topbar-toggle" onclick="toggleSidebar()" title="Alternar menú">
@@ -35,9 +36,39 @@
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
+        var _sidebar  = document.querySelector('.sidebar');
+        var _overlay  = document.getElementById('sidebar-overlay');
+        var _isMobile = function() { return window.innerWidth <= 1024; };
+
         function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('collapsed');
+            if (_isMobile()) {
+                _sidebar.classList.toggle('mobile-open');
+                _overlay.classList.toggle('active');
+            } else {
+                _sidebar.classList.toggle('collapsed');
+            }
         }
+
+        function closeSidebar() {
+            _sidebar.classList.remove('mobile-open');
+            _overlay.classList.remove('active');
+        }
+
+        // Close sidebar on nav link click (mobile)
+        document.querySelectorAll('.nav-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (_isMobile()) closeSidebar();
+            });
+        });
+
+        // Entrance animations only on first load after login
+        (function() {
+            if (!sessionStorage.getItem('appLoaded')) {
+                document.body.classList.add('first-entry');
+                document.querySelector('.sidebar')?.classList.add('sidebar-animate');
+                sessionStorage.setItem('appLoaded', '1');
+            }
+        })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
