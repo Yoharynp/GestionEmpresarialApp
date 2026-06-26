@@ -1,0 +1,319 @@
+@model IEnumerable<GestionEmpresarialApp.Models.Product>
+@{
+    ViewData["Title"] = "Productos";
+    bool canCreate   = ViewBag.CanCreate == true;
+    bool canEdit     = ViewBag.CanEdit   == true;
+    bool canDelete   = ViewBag.CanDelete == true;
+    string search    = ViewBag.Search ?? "";
+    var categories   = ViewBag.Categories as List<GestionEmpresarialApp.Models.Category> ?? new List<GestionEmpresarialApp.Models.Category>();
+    var urlCreate    = Url.Action("Create") ?? "/Products/Create";
+    var urlEdit      = Url.Action("Edit")   ?? "/Products/Edit";
+    var urlIndex     = Url.Action("Index")  ?? "/Products";
+}
+
+<div class="page-top-row">
+    <div class="page-header" style="margin-bottom: 0;">
+        <div class="page-header-accent"></div>
+        <h3>Gestión de Productos</h3>
+        <p>Administre el catálogo de productos</p>
+    </div>
+    @if (canCreate)
+    {
+        <button type="button" class="btn-new" onclick="openForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nuevo Producto
+        </button>
+    }
+</div>
+
+@if (ViewBag.FormError != null)
+{
+    <div class="form-error-banner">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+        @ViewBag.FormError
+    </div>
+}
+
+<div class="inline-form-panel" id="inline-form" style="display:none;">
+    <div class="form-panel">
+        <div class="form-panel-top-accent"></div>
+        <div class="form-panel-header">
+            <h4 class="form-panel-title" id="form-title">Nuevo Producto</h4>
+            <button type="button" class="btn-icon" onclick="closeForm()" title="Cerrar">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="product-form" method="post" action="@urlCreate">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="form-product-id" name="ProductId" value="0">
+            <input type="hidden" id="form-created-at" name="CreatedAt" value="">
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="form-group">
+                    <label for="field-code">Código *</label>
+                    <input type="text" id="field-code" name="Code" placeholder="PROD-001">
+                    <span class="field-error" id="err-code"></span>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="field-name">Nombre *</label>
+                    <input type="text" id="field-name" name="Name" placeholder="Nombre del producto">
+                    <span class="field-error" id="err-name"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="field-price">Precio *</label>
+                    <input type="number" id="field-price" name="Price" placeholder="0.00" min="0" step="0.01">
+                    <span class="field-error" id="err-price"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="field-stock">Stock *</label>
+                    <input type="number" id="field-stock" name="Stock" placeholder="0" min="0" step="1">
+                    <span class="field-error" id="err-stock"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="field-category">Categoría</label>
+                    <select id="field-category" name="CategoryId">
+                        <option value="">— Sin categoría —</option>
+                        @foreach (var cat in categories)
+                        {
+                            <option value="@cat.CategoryId">@cat.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="field-status">Estado</label>
+                    <select id="field-status" name="Status">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save" id="btn-submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z M17 3v4H7V3 M7 13h10m-5-4v8" />
+                    </svg>
+                    <span id="btn-label">Crear Producto</span>
+                </button>
+                <button type="button" class="btn-cancel" onclick="closeForm()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-container" style="margin-top: 1.5rem;">
+    <div class="table-toolbar">
+        <form method="get" action="@urlIndex">
+            <div class="search-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <input type="text" name="search" value="@search" class="search-input" placeholder="Buscar por código, nombre o categoría...">
+            </div>
+        </form>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    @if (canEdit || canDelete)
+                    {
+                        <th>Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    var pCreated    = p.CreatedAt.ToString("o");
+                    var pDeleteUrl  = Url.Action("Delete", new { id = p.ProductId });
+                    var pCategoryId = p.CategoryId?.ToString() ?? "";
+                    <tr>
+                        <td class="font-mono">@p.Code</td>
+                        <td>@p.Name</td>
+                        <td style="color: var(--gray-600);">@(p.Category?.Name ?? "-")</td>
+                        <td>RD$ @p.Price.ToString("N2")</td>
+                        <td>
+                            @if (p.Stock <= 5)
+                            {
+                                <span class="status-badge inactive">@p.Stock</span>
+                            }
+                            else if (p.Stock <= 15)
+                            {
+                                <span class="status-badge warning" style="background:var(--amber-100);color:var(--amber-700);">@p.Stock</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge active">@p.Stock</span>
+                            }
+                        </td>
+                        <td>
+                            @if (p.Status == "activo")
+                            {
+                                <span class="status-badge active">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge inactive">Inactivo</span>
+                            }
+                        </td>
+                        @if (canEdit || canDelete)
+                        {
+                            <td>
+                                @if (canEdit)
+                                {
+                                    <button type="button" class="btn-table-action edit" title="Editar"
+                                        onclick="openEdit(@p.ProductId, '@p.Code', '@p.Name', @p.Price, @p.Stock, '@pCategoryId', '@p.Status', '@pCreated')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                                        </svg>
+                                    </button>
+                                }
+                                @if (canDelete)
+                                {
+                                    <form method="post" action="@pDeleteUrl" style="display:inline;"
+                                          onsubmit="return confirm('¿Eliminar producto @p.Name?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-table-action delete" title="Eliminar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 2rem; color: var(--gray-500);">Sin productos para mostrar.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-footer">
+        Mostrando @Model.Count() productos
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var formEl    = document.getElementById('inline-form');
+        var formTag   = document.getElementById('product-form');
+        var titleEl   = document.getElementById('form-title');
+        var btnLabel  = document.getElementById('btn-label');
+        var isEditMode = false;
+
+        function openForm() {
+            isEditMode = false;
+            formTag.action = '@urlCreate';
+            titleEl.textContent  = 'Nuevo Producto';
+            btnLabel.textContent = 'Crear Producto';
+            document.getElementById('form-product-id').value  = '0';
+            document.getElementById('form-created-at').value  = '';
+            document.getElementById('field-code').value       = '';
+            document.getElementById('field-name').value       = '';
+            document.getElementById('field-price').value      = '';
+            document.getElementById('field-stock').value      = '';
+            document.getElementById('field-category').value   = '';
+            document.getElementById('field-status').value     = 'activo';
+            clearErrors();
+            showPanel();
+        }
+
+        function openEdit(id, code, name, price, stock, categoryId, status, createdAt) {
+            isEditMode = true;
+            formTag.action = '@urlEdit';
+            titleEl.textContent  = 'Editar Producto';
+            btnLabel.textContent = 'Guardar Cambios';
+            document.getElementById('form-product-id').value  = id;
+            document.getElementById('form-created-at').value  = createdAt;
+            document.getElementById('field-code').value       = code;
+            document.getElementById('field-name').value       = name;
+            document.getElementById('field-price').value      = price;
+            document.getElementById('field-stock').value      = stock;
+            document.getElementById('field-category').value   = categoryId;
+            document.getElementById('field-status').value     = status;
+            clearErrors();
+            showPanel();
+        }
+
+        function showPanel() {
+            formEl.style.display = 'block';
+            formEl.classList.remove('panel-closing');
+            formEl.classList.add('panel-open');
+            formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeForm() {
+            formEl.classList.remove('panel-open');
+            formEl.classList.add('panel-closing');
+            setTimeout(function() {
+                formEl.style.display = 'none';
+                formEl.classList.remove('panel-closing');
+            }, 350);
+        }
+
+        function setError(fieldId, errId, msg) {
+            var f = document.getElementById(fieldId);
+            var e = document.getElementById(errId);
+            if (e) e.textContent = msg;
+            if (f) f.style.borderColor = msg ? 'var(--red-600)' : '';
+        }
+
+        function clearErrors() {
+            ['err-code','err-name','err-price','err-stock'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+            ['field-code','field-name','field-price','field-stock'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.style.borderColor = '';
+            });
+        }
+
+        formTag.addEventListener('submit', function(e) {
+            clearErrors();
+            var ok = true;
+
+            if (!document.getElementById('field-code').value.trim())
+                { setError('field-code', 'err-code', 'El código es requerido'); ok = false; }
+
+            if (!document.getElementById('field-name').value.trim())
+                { setError('field-name', 'err-name', 'El nombre es requerido'); ok = false; }
+
+            var price = parseFloat(document.getElementById('field-price').value);
+            if (isNaN(price) || price < 0)
+                { setError('field-price', 'err-price', 'Ingrese un precio válido (≥ 0)'); ok = false; }
+
+            var stock = parseInt(document.getElementById('field-stock').value);
+            if (isNaN(stock) || stock < 0)
+                { setError('field-stock', 'err-stock', 'Ingrese un stock válido (≥ 0)'); ok = false; }
+
+            if (!ok) e.preventDefault();
+        });
+    </script>
+}

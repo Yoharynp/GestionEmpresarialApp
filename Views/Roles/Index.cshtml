@@ -12,6 +12,14 @@
         new { Id = "roles.edit",    Name = "Modificar Roles",         Desc = "Permite editar permisos por rol",                  Category = "Roles" },
         new { Id = "audit.view",    Name = "Ver Logs",                Desc = "Permite visualizar los logs de acceso",            Category = "Auditoría" },
         new { Id = "audit.export",  Name = "Exportar Logs",           Desc = "Permite exportar logs a CSV",                     Category = "Auditoría" },
+        new { Id = "products.view", Name = "Ver Productos",           Desc = "Permite visualizar la lista de productos",         Category = "Productos" },
+        new { Id = "products.create", Name = "Crear Productos",       Desc = "Permite crear nuevos productos",                     Category = "Productos" },
+        new { Id = "products.edit", Name = "Modificar Productos",      Desc = "Permite editar información de productos",          Category = "Productos" },
+        new { Id = "products.delete", Name = "Eliminar Productos",     Desc = "Permite eliminar productos del sistema",           Category = "Productos" },
+        new { Id = "clients.view", Name = "Ver Clientes",             Desc = "Permite visualizar la lista de clientes",          Category = "Clientes" },
+        new { Id = "clients.create", Name = "Crear Clientes",         Desc = "Permite crear nuevos clientes",                       Category = "Clientes" },
+        new { Id = "clients.edit", Name = "Modificar Clientes",        Desc = "Permite editar información de clientes",          Category = "Clientes" },
+        new { Id = "clients.delete", Name = "Eliminar Clientes",      Desc = "Permite eliminar clientes del sistema",           Category = "Clientes" }
     };
 
     var categories   = allPermissions.Select(p => p.Category).Distinct().ToList();

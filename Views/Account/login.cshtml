@@ -119,6 +119,9 @@
 
     </div>
 <script>
+    // Clear session flags so animations replay on next login
+    sessionStorage.removeItem('appLoaded');
+
     document.getElementById('btn-login').closest('form').addEventListener('submit', function(e) {
         var ok = true;
 

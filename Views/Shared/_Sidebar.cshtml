@@ -10,6 +10,8 @@
     bool showUsers = SessionPermissions.Has(Context.Session, "users.view")  || isAdmin;
     bool showRoles = SessionPermissions.Has(Context.Session, "roles.view")  || isAdmin;
     bool showAudit = SessionPermissions.Has(Context.Session, "audit.view")  || isAdmin;
+    bool showProducts = SessionPermissions.Has(Context.Session, "products.view") || isAdmin;
+    bool showClients = SessionPermissions.Has(Context.Session, "clients.view") || isAdmin;
 }
 
 <aside class="sidebar" id="sidebar">
@@ -53,6 +55,29 @@
             </a>
         }
 
+        @if (showProducts)
+        {
+            <a href="@Url.Action("Index", "Products")"
+               class="nav-btn @(ctrl == "Products" ? "active" : "")">
+                <div class="nav-btn-accent"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m16.5 0a48.108 48.108 0 00-16.5 0m16.5 0v-1.5c0-1.012-.609-1.934-1.55-2.316a48.56 48.56 0 00-14.9 0C5.34 3.066 4.75 3.988 4.75 5v1.5m16.5 0v10a2.25 2.25 0 01-2.25 2.25h-11.5A2.25 2.25 0 014.75 17V7m16.5 0H4.75" />
+                </svg>
+                Productos
+            </a>
+        }
+        @if (showClients)
+        {
+            <a href="@Url.Action("Index", "Clients")"
+               class="nav-btn @(ctrl == "Clients" ? "active" : "")">
+                <div class="nav-btn-accent"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0    0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />         
+              </svg>
+                Clientes
+            </a>
+        }
+
         @if (showAudit)
         {
             <a href="@Url.Action("Index", "Audit")"
@@ -64,6 +89,7 @@
                 Logs de Acceso
             </a>
         }
+        
     </nav>
 
     <div class="sidebar-footer">
