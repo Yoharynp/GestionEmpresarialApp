@@ -56,6 +56,34 @@ CREATE TABLE audit_logs (
     created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
+create table categories (
+    category_id SERIAL primary key,
+    name       varchar(100) not null unique
+);
+
+create table clients (
+    client_id SERIAL primary key,
+    first_name     varchar(100) not null,
+    last_name   varchar(100) not null,
+    phone   varchar(20),
+    email      varchar(150),
+    address  text,
+    status     varchar(20) default 'activo',
+    created_at timestamptz default now()
+);
+
+create table products (
+    product_id  SERIAL primary key,
+    code       varchar(50)    not null unique,
+    name       varchar(150)   not null,
+    price       NUMERIC(10,2)  not null default 0,
+    stock        int            not null default 0,
+    category_id int            references categories(category_id),
+    status       varchar(20)    default 'activo',
+    created_at   timestamptz    default now()
+);
+
+
 -- Roles
 INSERT INTO roles (rol_name, description) VALUES
     ('Administrador', 'Acceso total al sistema'),
@@ -67,6 +95,8 @@ INSERT INTO usuarios (username, password, rol_id) VALUES
     ('admin',      '12345', 1),
     ('supervisor', '12345', 2),
     ('ejecutor',   '12345', 3);
+    
+INSERT INTO categories (name) VALUES ('Electrónica'), ('Ropa'), ('Alimentos'), ('Hogar'), ('Otros');
 ```
 
 ### 2. Configurar el connection string
