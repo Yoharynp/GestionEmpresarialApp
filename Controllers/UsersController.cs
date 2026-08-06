@@ -32,9 +32,8 @@ namespace GestionEmpresarialApp.Controllers
             IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
         };
 
-        private async Task PopulateViewBag(string? search = null)
+        private async Task PopulateViewBag()
         {
-            ViewBag.Search    = search;
             ViewBag.IsAdmin   = IsAdmin();
             ViewBag.CanCreate = CanCreate();
             ViewBag.CanEdit   = CanEdit();
@@ -42,23 +41,73 @@ namespace GestionEmpresarialApp.Controllers
             ViewBag.Roles     = await _context.Roles.ToListAsync();
         }
 
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index()
         {
             if (!IsAuthenticated()) return RedirectToAction("Login", "Account");
             if (!CanView())         return RedirectToAction("Index", "Home");
 
-            await PopulateViewBag(search);
+            await PopulateViewBag();
 
-            var query = _context.Usuarios.Include(u => u.Rol).AsQueryable();
+            var users = await _context.Usuarios
+                .Include(u => u.Rol)
+                .OrderBy(u => u.Username)
+                .ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(u =>
-                    u.Username.Contains(search) ||
-                    (u.FullName != null && u.FullName.Contains(search)) ||
-                    (u.Email    != null && u.Email.Contains(search))    ||
-                    u.Rol.NombreRol.Contains(search));
+            return View(users);
+        }
 
-            return View(await query.OrderBy(u => u.Username).ToListAsync());
+        [HttpGet]
+        public async Task<IActionResult> Report()
+        {
+            if (!IsAuthenticated()) return RedirectToAction("Login", "Account");
+            if (!CanView())         return RedirectToAction("Index", "Home");
+
+            var users = await _context.Usuarios
+                .Include(u => u.Rol)
+                .OrderBy(u => u.Username)
+                .ToListAsync();
+
+            ViewBag.GeneratedAt = DateTime.Now;
+            ViewBag.GeneratedBy = HttpContext.Session.GetString("Username") ?? "";
+            return View(users);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export()
+        {
+            if (!IsAuthenticated()) return RedirectToAction("Login", "Account");
+            if (!CanView())         return RedirectToAction("Index", "Home");
+
+            var users = await _context.Usuarios
+                .Include(u => u.Rol)
+                .OrderBy(u => u.Username)
+                .ToListAsync();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("Usuario,Nombre Completo,Email,Rol,Estado,Fecha Registro");
+            foreach (var u in users)
+            {
+                sb.AppendLine(string.Join(",",
+                    CsvField(u.Username),
+                    CsvField(u.FullName),
+                    CsvField(u.Email),
+                    CsvField(u.Rol?.NombreRol),
+                    CsvField(u.Status),
+                    CsvField(u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy"))));
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetPreamble()
+                .Concat(System.Text.Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+            var filename = $"usuarios_{DateTime.Now:yyyyMMdd_HHmm}.csv";
+            return File(bytes, "text/csv; charset=utf-8", filename);
+        }
+
+        private static string CsvField(string? value)
+        {
+            if (string.IsNullOrEmpty(value)) return "";
+            return value.Contains(',') || value.Contains('"') || value.Contains('\n')
+                ? $"\"{value.Replace("\"", "\"\"")}\""
+                : value;
         }
 
         [HttpGet]

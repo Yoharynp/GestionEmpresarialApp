@@ -32,9 +32,8 @@ namespace GestionEmpresarialApp.Controllers
             IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
         };
 
-        private async Task PopulateViewBag(string? search = null)
+        private async Task PopulateViewBag()
         {
-            ViewBag.Search     = search;
             ViewBag.IsAdmin    = IsAdmin();
             ViewBag.CanCreate  = CanCreate();
             ViewBag.CanEdit    = CanEdit();
@@ -42,22 +41,74 @@ namespace GestionEmpresarialApp.Controllers
             ViewBag.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
         }
 
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index()
         {
             if (!IsAuthenticated()) return RedirectToAction("Login", "Account");
             if (!CanView())         return RedirectToAction("Index", "Home");
 
-            await PopulateViewBag(search);
+            await PopulateViewBag();
 
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
+            var products = await _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Name)
+                .ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(p =>
-                    p.Name.Contains(search) ||
-                    p.Code.Contains(search) ||
-                    (p.Category != null && p.Category.Name.Contains(search)));
+            return View(products);
+        }
 
-            return View(await query.OrderBy(p => p.Name).ToListAsync());
+        [HttpGet]
+        public async Task<IActionResult> Report()
+        {
+            if (!IsAuthenticated()) return RedirectToAction("Login", "Account");
+            if (!CanView())         return RedirectToAction("Index", "Home");
+
+            var products = await _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Name)
+                .ToListAsync();
+
+            ViewBag.GeneratedAt = DateTime.Now;
+            ViewBag.GeneratedBy = HttpContext.Session.GetString("Username") ?? "";
+            return View(products);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export()
+        {
+            if (!IsAuthenticated()) return RedirectToAction("Login", "Account");
+            if (!CanView())         return RedirectToAction("Index", "Home");
+
+            var products = await _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Name)
+                .ToListAsync();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("Código,Nombre,Categoría,Precio,Stock,Estado,Fecha Registro");
+            foreach (var p in products)
+            {
+                sb.AppendLine(string.Join(",",
+                    CsvField(p.Code),
+                    CsvField(p.Name),
+                    CsvField(p.Category?.Name),
+                    p.Price.ToString("F2"),
+                    p.Stock.ToString(),
+                    CsvField(p.Status),
+                    CsvField(p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy"))));
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetPreamble()
+                .Concat(System.Text.Encoding.UTF8.GetBytes(sb.ToString())).ToArray();
+            var filename = $"productos_{DateTime.Now:yyyyMMdd_HHmm}.csv";
+            return File(bytes, "text/csv; charset=utf-8", filename);
+        }
+
+        private static string CsvField(string? value)
+        {
+            if (string.IsNullOrEmpty(value)) return "";
+            return value.Contains(',') || value.Contains('"') || value.Contains('\n')
+                ? $"\"{value.Replace("\"", "\"\"")}\""
+                : value;
         }
 
         [HttpGet]

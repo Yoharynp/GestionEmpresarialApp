@@ -1,0 +1,245 @@
+@model IEnumerable<GestionEmpresarialApp.Models.Usuario>
+@{
+    Layout = null;
+    DateTime generatedAt = ViewBag.GeneratedAt ?? DateTime.Now;
+    string   generatedBy = ViewBag.GeneratedBy ?? "";
+    int      total       = Model.Count();
+    int      activos     = Model.Count(u => u.Status == "activo");
+    int      inactivos   = total - activos;
+    var      culture     = new System.Globalization.CultureInfo("es-DO");
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reporte de Usuarios</title>
+    <style>
+        @@font-face {
+            font-family: 'Plus Jakarta Sans';
+            src: url('/fonts/PlusJakartaSans-VariableFont_wght.ttf') format('truetype-variations');
+            font-weight: 100 800;
+        }
+
+        :root {
+            --white: #FFFFFF;
+            --gray-50: #F9FAFB;
+            --gray-200: #E5E7EB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --blue-600: #2563EB;
+            --green-50: #F0FDF4;
+            --green-600: #16A34A;
+            --red-50: #FEF2F2;
+            --red-600: #DC2626;
+            --purple-50: #FAF5FF;
+            --purple-600: #9333EA;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: var(--gray-700);
+            background-color: var(--gray-50);
+        }
+
+        .report-toolbar {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--gray-200);
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .toolbar-brand { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--gray-500); }
+        .toolbar-brand strong { color: var(--gray-900); font-weight: 600; }
+        .toolbar-brand span   { color: var(--gray-400); }
+        .toolbar-actions { margin-left: auto; }
+
+        .btn-print {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            background-color: var(--blue-600);
+            color: var(--white);
+            border: 2px solid var(--blue-600);
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-print:hover { background-color: #1D4ED8; border-color: #1D4ED8; }
+        .btn-print svg { width: 0.9rem; height: 0.9rem; }
+
+        .report-page { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem 3rem; }
+
+        .report-header {
+            border-left: 4px solid var(--blue-600);
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .report-header h2 { font-size: 1.25rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.15rem; }
+        .report-header p  { font-size: 0.8rem; color: var(--gray-500); }
+        .report-meta-row  { display: flex; gap: 2rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .report-meta-row span { font-size: 0.78rem; color: var(--gray-500); }
+        .report-meta-row span strong { color: var(--gray-700); font-weight: 600; }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .summary-card {
+            background-color: var(--white);
+            border: 2px solid var(--gray-200);
+            border-left: 4px solid var(--blue-600);
+            padding: 1rem 1.25rem;
+        }
+        .summary-card.green  { border-left-color: var(--green-600); }
+        .summary-card.red    { border-left-color: var(--red-600); }
+        .summary-card-label  { font-size: 0.72rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.35rem; }
+        .summary-card-value  { font-size: 1.75rem; font-weight: 700; color: var(--gray-900); line-height: 1; }
+
+        .table-container { background-color: var(--white); border: 2px solid var(--gray-200); }
+        .table-scroll { overflow-x: auto; }
+        .table-title {
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid var(--gray-200);
+            font-size: 0.8rem; font-weight: 600; color: var(--gray-700);
+            background-color: var(--gray-50);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        thead { background-color: var(--gray-50); border-bottom: 2px solid var(--gray-200); }
+        th { padding: 0.65rem 0.85rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--gray-700); white-space: nowrap; }
+        td { padding: 0.65rem 0.85rem; font-size: 0.83rem; color: var(--gray-900); border-bottom: 1px solid var(--gray-200); }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr { border-left: 4px solid transparent; }
+
+        .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-left: 4px solid; font-size: 0.78rem; font-weight: 500; }
+        .status-badge.active   { background-color: var(--green-50);  color: var(--green-600);  border-color: var(--green-600); }
+        .status-badge.inactive { background-color: var(--red-50);    color: var(--red-600);    border-color: var(--red-600); }
+        .status-badge.role     { background-color: var(--purple-50); color: var(--purple-600); border-color: var(--purple-600); }
+
+        .table-footer-bar {
+            padding: 0.65rem 1rem;
+            border-top: 2px solid var(--gray-200);
+            background-color: var(--gray-50);
+            font-size: 0.78rem; color: var(--gray-500);
+            display: flex; justify-content: space-between;
+        }
+
+        td.muted   { color: var(--gray-500); }
+        td.num-col { color: var(--gray-400); font-size: 0.75rem; }
+
+        @@media print {
+            body { background: var(--white); }
+            .report-toolbar { display: none !important; }
+            .report-page { margin: 0; padding: 1.5rem; max-width: 100%; }
+            .table-container { border: 1px solid var(--gray-200); }
+            .status-badge, .summary-card, thead { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-toolbar">
+    <div class="toolbar-brand">
+        <strong>Gestión Empresarial</strong>
+        <span>/</span>
+        <span>Reporte de Usuarios</span>
+    </div>
+    <div class="toolbar-actions">
+        <button class="btn-print" onclick="window.print()">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.75 19.5a.75.75 0 001.5 0V14.25m9-1.421l-.72-.096m.72.096a42.415 42.415 0 01-10.56 0m10.56 0L17.25 19.5a.75.75 0 01-1.5 0V14.25M8.25 8.25h7.5V6a2.25 2.25 0 00-2.25-2.25h-3A2.25 2.25 0 008.25 6v2.25zM6 8.25H4.5A2.25 2.25 0 002.25 10.5v6A2.25 2.25 0 004.5 18.75H6v-3.75a.75.75 0 01.75-.75h10.5a.75.75 0 01.75.75V18.75h1.5A2.25 2.25 0 0021.75 16.5v-6A2.25 2.25 0 0019.5 8.25H18" />
+            </svg>
+            Imprimir / PDF
+        </button>
+    </div>
+</div>
+
+<div class="report-page">
+
+    <div class="report-header">
+        <h2>Reporte de Usuarios</h2>
+        <p>Sistema de Gestión Empresarial</p>
+        <div class="report-meta-row">
+            <span><strong>Fecha:</strong> @generatedAt.ToString("dd 'de' MMMM 'de' yyyy, hh:mm tt", culture)</span>
+            <span><strong>Generado por:</strong> @generatedBy</span>
+        </div>
+    </div>
+
+    <div class="summary-row">
+        <div class="summary-card">
+            <div class="summary-card-label">Total de Registros</div>
+            <div class="summary-card-value">@total</div>
+        </div>
+        <div class="summary-card green">
+            <div class="summary-card-label">Usuarios Activos</div>
+            <div class="summary-card-value">@activos</div>
+        </div>
+        <div class="summary-card red">
+            <div class="summary-card-label">Usuarios Inactivos</div>
+            <div class="summary-card-value">@inactivos</div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-title">Listado completo de usuarios del sistema</div>
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Usuario</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td class="num-col">@(i++)</td>
+                        <td style="font-weight:600;">@u.Username</td>
+                        <td>@(string.IsNullOrEmpty(u.FullName) ? "—" : u.FullName)</td>
+                        <td class="muted">@(string.IsNullOrEmpty(u.Email) ? "—" : u.Email)</td>
+                        <td><span class="status-badge role">@(u.Rol?.NombreRol ?? "—")</span></td>
+                        <td>
+                            <span class="status-badge @(u.Status == "activo" ? "active" : "inactive")">
+                                @(u.Status == "activo" ? "Activo" : "Inactivo")
+                            </span>
+                        </td>
+                        <td class="muted" style="font-size:0.8rem;">@u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--gray-400);">Sin registros.</td></tr>
+                }
+            </tbody>
+        </table>
+        </div>
+        <div class="table-footer-bar">
+            <span>@total usuario@(total != 1 ? "s" : "") en total</span>
+            <span>Generado el @generatedAt.ToString("dd/MM/yyyy 'a las' hh:mm tt", culture)</span>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

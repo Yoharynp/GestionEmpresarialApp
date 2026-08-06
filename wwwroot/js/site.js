@@ -1,3 +1,50 @@
+// Normalize text for accent- and case-insensitive comparison
+function normalizeText(s) {
+    return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+// Wire real-time client-side search on a table (no page reload).
+// inputId   — id of the search <input>
+// tableId   — id of the <table>
+// countId   — id of the counter element (optional)
+// countWord — label word, e.g. 'clientes'
+function wireTableSearch(inputId, tableId, countId, countWord) {
+    var input = document.getElementById(inputId);
+    var tbody = document.querySelector('#' + tableId + ' tbody');
+    if (!input || !tbody) return;
+
+    function doFilter() {
+        var term = normalizeText(input.value.trim());
+        var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+        var visible = 0;
+        rows.forEach(function (row) {
+            // empty-state row (single spanning cell) — always show when term is empty
+            if (row.cells.length <= 1) {
+                row.style.display = term ? 'none' : '';
+                return;
+            }
+            var text = normalizeText(row.textContent);
+            var show = !term || text.indexOf(term) !== -1;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        // update empty-state row visibility
+        rows.forEach(function (row) {
+            if (row.cells.length <= 1) row.style.display = (visible === 0 ? '' : 'none');
+        });
+        if (countId) {
+            var el = document.getElementById(countId);
+            if (el) el.textContent = 'Mostrando ' + visible + ' ' + (countWord || 'registros');
+        }
+    }
+
+    input.addEventListener('input', doFilter);
+    // Prevent Enter from submitting any parent form
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+}
+
 // Formats a local RD 10-digit block as (XXX)-XXX-XXXX
 function formatLocalBlock(digits) {
     var d = digits.substring(0, 10);
