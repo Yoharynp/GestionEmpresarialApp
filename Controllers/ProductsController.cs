@@ -32,15 +32,6 @@ namespace GestionEmpresarialApp.Controllers
             IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
         };
 
-        private async Task<(int critical, int warning)> GetDefaultThresholds()
-        {
-            var critical = await _context.Settings.FindAsync("stock.threshold.critical");
-            var warning  = await _context.Settings.FindAsync("stock.threshold.warning");
-            int c = int.TryParse(critical?.Value, out var cv) ? cv : 5;
-            int w = int.TryParse(warning?.Value,  out var wv) ? wv : 15;
-            return (c, w);
-        }
-
         private async Task PopulateViewBag()
         {
             ViewBag.IsAdmin    = IsAdmin();
@@ -48,9 +39,6 @@ namespace GestionEmpresarialApp.Controllers
             ViewBag.CanEdit    = CanEdit();
             ViewBag.CanDelete  = CanDelete();
             ViewBag.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-            var (dc, dw) = await GetDefaultThresholds();
-            ViewBag.DefaultCritical = dc;
-            ViewBag.DefaultWarning  = dw;
         }
 
         public async Task<IActionResult> Index()

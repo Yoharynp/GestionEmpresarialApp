@@ -7,8 +7,6 @@
     var categories   = ViewBag.Categories as List<GestionEmpresarialApp.Models.Category> ?? new List<GestionEmpresarialApp.Models.Category>();
     var urlCreate    = Url.Action("Create") ?? "/Products/Create";
     var urlEdit      = Url.Action("Edit")   ?? "/Products/Edit";
-    int defaultCrit  = (int)(ViewBag.DefaultCritical ?? 5);
-    int defaultWarn  = (int)(ViewBag.DefaultWarning  ?? 15);
 }
 
 <div class="page-top-row">
@@ -262,8 +260,8 @@
             document.getElementById('field-name').value           = '';
             document.getElementById('field-price').value          = '';
             document.getElementById('field-stock').value          = '';
-            document.getElementById('field-stock-critical').value = '@defaultCrit';
-            document.getElementById('field-stock-warning').value  = '@defaultWarn';
+            document.getElementById('field-stock-critical').value = '5';
+            document.getElementById('field-stock-warning').value  = '15';
             document.getElementById('field-category').value       = '';
             document.getElementById('field-status').value         = 'activo';
             clearErrors();
