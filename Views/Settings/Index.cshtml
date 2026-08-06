@@ -1,0 +1,73 @@
+@model IEnumerable<GestionEmpresarialApp.Models.Setting>
+@{
+    ViewData["Title"] = "Configuración";
+    bool saved = TempData["SettingsSaved"] as string == "true";
+}
+
+<div class="page-top-row">
+    <div class="page-header" style="margin-bottom: 0;">
+        <div class="page-header-accent"></div>
+        <h3>Configuración del Sistema</h3>
+        <p>Parámetros globales del sistema</p>
+    </div>
+</div>
+
+@if (saved)
+{
+    <div class="form-success-banner" style="margin-top:1rem;">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" style="width:1.1rem;height:1.1rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Configuración guardada correctamente.
+    </div>
+}
+
+<div class="content-card" style="margin-top:1.5rem; max-width: 640px;">
+    <div class="content-card-left-accent"></div>
+    <div class="content-card-header">
+        <h4>Umbrales de Stock de Inventario</h4>
+        <div class="content-card-header-underline"></div>
+    </div>
+    <div class="content-card-body" style="padding: 1.5rem;">
+        <p style="color:var(--gray-500); font-size:0.875rem; margin-bottom:1.5rem;">
+            Define cuándo un producto debe aparecer con alerta de stock bajo (naranja) o stock crítico (rojo).
+        </p>
+
+        @foreach (var s in Model)
+        {
+            <form method="post" action="@Url.Action("Save")" style="margin-bottom:1.25rem;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="key" value="@s.Key" />
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                    <label style="font-weight:600; color:var(--gray-700); font-size:0.875rem;">
+                        @(s.Description ?? s.Key)
+                    </label>
+                    <div style="display:flex; gap:0.75rem; align-items:center; margin-top:0.5rem;">
+                        <input type="number" name="value" value="@s.Value" min="0" step="1"
+                               style="width:120px; padding:0.5rem 0.75rem; border:2px solid var(--gray-200);
+                                      font-family:inherit; font-size:0.875rem; background:var(--white); color:var(--gray-900);" />
+                        <button type="submit" class="btn-save" style="padding:0.5rem 1rem; font-size:0.8rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" style="width:1rem;height:1rem;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z" />
+                            </svg>
+                            Guardar
+                        </button>
+                    </div>
+                    <span style="font-size:0.78rem; color:var(--gray-400); margin-top:0.25rem; display:block;">
+                        Valor actual: <strong>@s.Value</strong> — Última actualización: @s.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                </div>
+            </form>
+        }
+
+        <div style="margin-top:1.5rem; padding:1rem; border-left:4px solid var(--blue-600); background:var(--gray-50); border: 2px solid var(--gray-200); border-left:4px solid var(--blue-600);">
+            <p style="font-size:0.8rem; color:var(--gray-600); font-weight:600; margin-bottom:0.5rem;">Cómo funciona:</p>
+            <ul style="font-size:0.8rem; color:var(--gray-500); padding-left:1.25rem; line-height:1.8;">
+                <li>Stock = 0 → <span style="color:var(--red-600); font-weight:600;">Rojo</span> (Sin stock)</li>
+                <li>Stock ≤ umbral crítico → <span style="color:var(--red-600); font-weight:600;">Rojo</span></li>
+                <li>Stock ≤ umbral de aviso → <span style="color:#D97706; font-weight:600;">Naranja</span></li>
+                <li>Stock > umbral de aviso → <span style="color:var(--green-600); font-weight:600;">Verde</span></li>
+            </ul>
+        </div>
+    </div>
+</div>

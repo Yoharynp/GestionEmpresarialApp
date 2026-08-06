@@ -8,6 +8,8 @@
     int      sinStock    = Model.Count(p => p.Stock <= 0);
     decimal  valorTotal  = Model.Sum(p => p.Price * p.Stock);
     var      culture     = new System.Globalization.CultureInfo("es-DO");
+    int      threshCrit  = (int)(ViewBag.ThresholdCritical ?? 5);
+    int      threshWarn  = (int)(ViewBag.ThresholdWarning  ?? 15);
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -133,7 +135,8 @@
         .status-badge.active   { background-color: var(--green-50);  color: var(--green-600);  border-color: var(--green-600); }
         .status-badge.inactive { background-color: var(--red-50);    color: var(--red-600);    border-color: var(--red-600); }
         .status-badge.stock-ok   { background-color: var(--green-50);  color: var(--green-600);  border-color: var(--green-600); }
-        .status-badge.stock-low  { background-color: var(--yellow-50); color: var(--yellow-600); border-color: var(--yellow-600); }
+        .status-badge.stock-warn { background-color: var(--yellow-50); color: var(--yellow-600); border-color: var(--yellow-600); }
+        .status-badge.stock-low  { background-color: var(--red-50);    color: var(--red-600);    border-color: var(--red-600); }
         .status-badge.stock-zero { background-color: var(--red-50);    color: var(--red-600);    border-color: var(--red-600); }
 
         .font-mono { font-family: 'Courier New', monospace; font-size: 0.8rem; }
@@ -225,7 +228,7 @@
                 @{ int i = 1; }
                 @foreach (var p in Model)
                 {
-                    string stockClass = p.Stock <= 0 ? "stock-zero" : (p.Stock <= 5 ? "stock-low" : "stock-ok");
+                    string stockClass = p.Stock <= 0 ? "stock-zero" : (p.Stock <= threshCrit ? "stock-low" : (p.Stock <= threshWarn ? "stock-warn" : "stock-ok"));
                     <tr>
                         <td class="num-col">@(i++)</td>
                         <td class="font-mono">@p.Code</td>

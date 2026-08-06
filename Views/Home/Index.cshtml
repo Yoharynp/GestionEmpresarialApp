@@ -1,22 +1,26 @@
 @using GestionEmpresarialApp.Models
 @{
     ViewData["Title"] = "Panel Principal";
-    var username     = ViewBag.Username as string ?? "Usuario";
-    var role         = ViewBag.Rol as string ?? "";
-    var totalUsers   = (int)(ViewBag.TotalUsers ?? 0);
-    var totalRoles   = (int)(ViewBag.TotalRoles ?? 0);
+    var username      = ViewBag.Username as string ?? "Usuario";
+    var role          = ViewBag.Rol as string ?? "";
+    var totalUsers    = (int)(ViewBag.TotalUsers    ?? 0);
+    var totalRoles    = (int)(ViewBag.TotalRoles    ?? 0);
+    var totalClients  = (int)(ViewBag.TotalClients  ?? 0);
+    var totalProducts = (int)(ViewBag.TotalProducts ?? 0);
+    var lowStock      = (int)(ViewBag.LowStockCount ?? 0);
+    var noStock       = (int)(ViewBag.NoStockCount  ?? 0);
     var accessesToday = (int)(ViewBag.AccessesToday ?? 0);
-    var failedToday  = (int)(ViewBag.FailedToday ?? 0);
-    var recentLogs   = ViewBag.RecentLogs as List<AuditLog> ?? new List<AuditLog>();
+    var failedToday   = (int)(ViewBag.FailedToday   ?? 0);
+    var recentLogs    = ViewBag.RecentLogs as List<AuditLog> ?? new List<AuditLog>();
 }
 
 <div class="page-header">
     <div class="page-header-accent"></div>
     <h3>Bienvenido, @username</h3>
-    <p>Resumen del sistema de control de acceso</p>
+    <p>Resumen del sistema de gestión empresarial</p>
 </div>
 
-<div class="stats-grid">
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
     <div class="stat-card border-blue">
         <div class="stat-card-bg-icon">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
@@ -29,8 +33,8 @@
             </svg>
         </div>
         <div class="stat-value">@totalUsers</div>
-        <div class="stat-label">Usuarios Registrados</div>
-        <div class="stat-change">Total en el sistema</div>
+        <div class="stat-label">Usuarios</div>
+        <div class="stat-change">Registrados en el sistema</div>
     </div>
 
     <div class="stat-card border-purple">
@@ -45,14 +49,46 @@
             </svg>
         </div>
         <div class="stat-value">@totalRoles</div>
-        <div class="stat-label">Roles Configurados</div>
-        <div class="stat-change">Total en el sistema</div>
+        <div class="stat-label">Roles</div>
+        <div class="stat-change">Configurados en el sistema</div>
+    </div>
+
+    <div class="stat-card border-teal">
+        <div class="stat-card-bg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+            </svg>
+        </div>
+        <div class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+        </div>
+        <div class="stat-value">@totalClients</div>
+        <div class="stat-label">Clientes</div>
+        <div class="stat-change">Total registrados</div>
+    </div>
+
+    <div class="stat-card border-indigo">
+        <div class="stat-card-bg-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622" />
+            </svg>
+        </div>
+        <div class="stat-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m16.5 0a48.108 48.108 0 00-16.5 0m16.5 0v-1.5c0-1.012-.609-1.934-1.55-2.316a48.56 48.56 0 00-14.9 0C5.34 3.066 4.75 3.988 4.75 5v1.5" />
+            </svg>
+        </div>
+        <div class="stat-value">@totalProducts</div>
+        <div class="stat-label">Productos</div>
+        <div class="stat-change">En el catálogo</div>
     </div>
 
     <div class="stat-card border-green">
         <div class="stat-card-bg-icon">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25" />
             </svg>
         </div>
         <div class="stat-card-icon">
@@ -77,10 +113,28 @@
             </svg>
         </div>
         <div class="stat-value">@failedToday</div>
-        <div class="stat-label">Intentos Fallidos Hoy</div>
-        <div class="stat-change">Credenciales incorrectas</div>
+        <div class="stat-label">Intentos Fallidos</div>
+        <div class="stat-change">Credenciales incorrectas hoy</div>
     </div>
 </div>
+
+@if (noStock > 0 || lowStock > 0)
+{
+    <div style="margin-top:1.5rem; padding:1rem 1.25rem; border:2px solid var(--gray-200); border-left:4px solid #D97706; background:var(--white); display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="#D97706" style="width:1.25rem;height:1.25rem;flex-shrink:0;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        </svg>
+        <div>
+            <span style="font-weight:600; color:#92400E; font-size:0.875rem;">Alerta de inventario:</span>
+            <span style="font-size:0.875rem; color:var(--gray-700);">
+                @if (noStock > 0) { <text>@noStock producto(s) sin stock o en stock crítico</text> }
+                @if (noStock > 0 && lowStock > 0) { <text> · </text> }
+                @if (lowStock > 0) { <text>@lowStock producto(s) con stock bajo</text> }
+            </span>
+        </div>
+        <a href="@Url.Action("Index", "Products")" style="margin-left:auto; font-size:0.8rem; color:var(--blue-600); font-weight:600; text-decoration:none;">Ver productos →</a>
+    </div>
+}
 
 <div class="content-grid">
     <div class="content-card">

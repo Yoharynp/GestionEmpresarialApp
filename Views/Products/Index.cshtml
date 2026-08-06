@@ -7,6 +7,8 @@
     var categories   = ViewBag.Categories as List<GestionEmpresarialApp.Models.Category> ?? new List<GestionEmpresarialApp.Models.Category>();
     var urlCreate    = Url.Action("Create") ?? "/Products/Create";
     var urlEdit      = Url.Action("Edit")   ?? "/Products/Edit";
+    int threshCrit   = (int)(ViewBag.ThresholdCritical ?? 5);
+    int threshWarn   = (int)(ViewBag.ThresholdWarning  ?? 15);
 }
 
 <div class="page-top-row">
@@ -163,11 +165,11 @@
                         <td style="color: var(--gray-600);">@(p.Category?.Name ?? "-")</td>
                         <td>RD$ @p.Price.ToString("N2")</td>
                         <td>
-                            @if (p.Stock <= 5)
+                            @if (p.Stock <= threshCrit)
                             {
                                 <span class="status-badge inactive">@p.Stock</span>
                             }
-                            else if (p.Stock <= 15)
+                            else if (p.Stock <= threshWarn)
                             {
                                 <span class="status-badge warning" style="background:var(--amber-100);color:var(--amber-700);">@p.Stock</span>
                             }

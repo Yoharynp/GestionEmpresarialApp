@@ -143,3 +143,29 @@ wwwroot/css/   → Estilos del sistema
 | Usuarios | `/Users/Index` | CRUD de cuentas de usuario |
 | Roles | `/Roles/Index` | Asignación de permisos por rol |
 | Auditoría | `/Audit/Index` | Historial de accesos y operaciones |
+
+## Nuevas tablas — Etapa III (ejecutar en PostgreSQL)
+
+```sql
+-- Configuración del sistema
+CREATE TABLE IF NOT EXISTS settings (
+    key         VARCHAR(100) PRIMARY KEY,
+    value       VARCHAR(500) NOT NULL,
+    description VARCHAR(500),
+    updated_at  TIMESTAMP DEFAULT NOW()
+);
+
+INSERT INTO settings (key, value, description) VALUES
+    ('stock.threshold.critical', '5',  'Stock crítico — se muestra en rojo'),
+    ('stock.threshold.warning',  '15', 'Stock bajo — se muestra en naranja')
+ON CONFLICT (key) DO NOTHING;
+
+-- Categorías (si no existe ya)
+CREATE TABLE IF NOT EXISTS categories (
+    category_id SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    status      VARCHAR(20) DEFAULT 'activo',
+    created_at  TIMESTAMP DEFAULT NOW()
+);
+```

@@ -17,6 +17,7 @@ namespace GestionEmpresarialApp.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Setting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,7 @@ namespace GestionEmpresarialApp.Data
             modelBuilder.Entity<Client>().ToTable("clients");
             modelBuilder.Entity<Product>().ToTable("products");
             modelBuilder.Entity<Category>().ToTable("categories");
+            modelBuilder.Entity<Setting>().ToTable("settings");
 
             modelBuilder.Entity<RolePermission>()
                 .HasIndex(rp => new { rp.RolId, rp.Permission })
