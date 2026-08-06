@@ -7,8 +7,8 @@
     var categories   = ViewBag.Categories as List<GestionEmpresarialApp.Models.Category> ?? new List<GestionEmpresarialApp.Models.Category>();
     var urlCreate    = Url.Action("Create") ?? "/Products/Create";
     var urlEdit      = Url.Action("Edit")   ?? "/Products/Edit";
-    int threshCrit   = (int)(ViewBag.ThresholdCritical ?? 5);
-    int threshWarn   = (int)(ViewBag.ThresholdWarning  ?? 15);
+    int defaultCrit  = (int)(ViewBag.DefaultCritical ?? 5);
+    int defaultWarn  = (int)(ViewBag.DefaultWarning  ?? 15);
 }
 
 <div class="page-top-row">
@@ -95,6 +95,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="field-stock-critical" title="Stock mínimo crítico (rojo)">Mínimo crítico 🔴</label>
+                    <input type="number" id="field-stock-critical" name="StockCritical" placeholder="5" min="0" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="field-stock-warning" title="Stock mínimo de aviso (naranja)">Mínimo de aviso 🟠</label>
+                    <input type="number" id="field-stock-warning" name="StockWarning" placeholder="15" min="0" step="1">
+                </div>
+
+                <div class="form-group">
                     <label for="field-category">Categoría</label>
                     <select id="field-category" name="CategoryId">
                         <option value="">— Sin categoría —</option>
@@ -165,13 +175,13 @@
                         <td style="color: var(--gray-600);">@(p.Category?.Name ?? "-")</td>
                         <td>RD$ @p.Price.ToString("N2")</td>
                         <td>
-                            @if (p.Stock <= threshCrit)
+                            @if (p.Stock <= p.StockCritical)
                             {
-                                <span class="status-badge inactive">@p.Stock</span>
+                                <span class="status-badge inactive" title="Crítico: mínimo @p.StockCritical">@p.Stock</span>
                             }
-                            else if (p.Stock <= threshWarn)
+                            else if (p.Stock <= p.StockWarning)
                             {
-                                <span class="status-badge warning" style="background:var(--amber-100);color:var(--amber-700);">@p.Stock</span>
+                                <span class="status-badge warning" style="background:var(--amber-100);color:var(--amber-700);" title="Bajo: mínimo @p.StockWarning">@p.Stock</span>
                             }
                             else
                             {
@@ -194,7 +204,7 @@
                                 @if (canEdit)
                                 {
                                     <button type="button" class="btn-table-action edit" title="Editar"
-                                        onclick="openEdit(@p.ProductId, '@p.Code', '@p.Name', @p.Price, @p.Stock, '@pCategoryId', '@p.Status', '@pCreated')">
+                                        onclick="openEdit(@p.ProductId, '@p.Code', '@p.Name', @p.Price, @p.Stock, @p.StockCritical, @p.StockWarning, '@pCategoryId', '@p.Status', '@pCreated')">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                                         </svg>
@@ -246,31 +256,35 @@
             formTag.action = '@urlCreate';
             titleEl.textContent  = 'Nuevo Producto';
             btnLabel.textContent = 'Crear Producto';
-            document.getElementById('form-product-id').value  = '0';
-            document.getElementById('form-created-at').value  = '';
-            document.getElementById('field-code').value       = '';
-            document.getElementById('field-name').value       = '';
-            document.getElementById('field-price').value      = '';
-            document.getElementById('field-stock').value      = '';
-            document.getElementById('field-category').value   = '';
-            document.getElementById('field-status').value     = 'activo';
+            document.getElementById('form-product-id').value      = '0';
+            document.getElementById('form-created-at').value      = '';
+            document.getElementById('field-code').value           = '';
+            document.getElementById('field-name').value           = '';
+            document.getElementById('field-price').value          = '';
+            document.getElementById('field-stock').value          = '';
+            document.getElementById('field-stock-critical').value = '@defaultCrit';
+            document.getElementById('field-stock-warning').value  = '@defaultWarn';
+            document.getElementById('field-category').value       = '';
+            document.getElementById('field-status').value         = 'activo';
             clearErrors();
             showPanel();
         }
 
-        function openEdit(id, code, name, price, stock, categoryId, status, createdAt) {
+        function openEdit(id, code, name, price, stock, stockCritical, stockWarning, categoryId, status, createdAt) {
             isEditMode = true;
             formTag.action = '@urlEdit';
             titleEl.textContent  = 'Editar Producto';
             btnLabel.textContent = 'Guardar Cambios';
-            document.getElementById('form-product-id').value  = id;
-            document.getElementById('form-created-at').value  = createdAt;
-            document.getElementById('field-code').value       = code;
-            document.getElementById('field-name').value       = name;
-            document.getElementById('field-price').value      = price;
-            document.getElementById('field-stock').value      = stock;
-            document.getElementById('field-category').value   = categoryId;
-            document.getElementById('field-status').value     = status;
+            document.getElementById('form-product-id').value      = id;
+            document.getElementById('form-created-at').value      = createdAt;
+            document.getElementById('field-code').value           = code;
+            document.getElementById('field-name').value           = name;
+            document.getElementById('field-price').value          = price;
+            document.getElementById('field-stock').value          = stock;
+            document.getElementById('field-stock-critical').value = stockCritical;
+            document.getElementById('field-stock-warning').value  = stockWarning;
+            document.getElementById('field-category').value       = categoryId;
+            document.getElementById('field-status').value         = status;
             clearErrors();
             showPanel();
         }

@@ -24,19 +24,15 @@ public class HomeController : Controller
 
         var today = DateTime.UtcNow.Date;
 
-        var critSetting = await _context.Settings.FindAsync("stock.threshold.critical");
-        var warnSetting = await _context.Settings.FindAsync("stock.threshold.warning");
-        int threshCrit  = int.TryParse(critSetting?.Value, out var cv) ? cv : 5;
-        int threshWarn  = int.TryParse(warnSetting?.Value,  out var wv) ? wv : 15;
-
         ViewBag.Username      = user;
         ViewBag.Rol           = rol;
         ViewBag.TotalUsers    = await _context.Usuarios.CountAsync();
         ViewBag.TotalRoles    = await _context.Roles.CountAsync();
         ViewBag.TotalClients  = await _context.Clients.CountAsync();
         ViewBag.TotalProducts = await _context.Products.CountAsync();
-        ViewBag.LowStockCount = await _context.Products.CountAsync(p => p.Stock > threshCrit && p.Stock <= threshWarn);
-        ViewBag.NoStockCount  = await _context.Products.CountAsync(p => p.Stock <= threshCrit);
+        // Umbrales por producto — cada uno tiene su propio mínimo crítico/aviso
+        ViewBag.NoStockCount  = await _context.Products.CountAsync(p => p.Stock <= p.StockCritical);
+        ViewBag.LowStockCount = await _context.Products.CountAsync(p => p.Stock > p.StockCritical && p.Stock <= p.StockWarning);
         ViewBag.AccessesToday = await _context.AuditLogs
             .CountAsync(l => l.Action == "LOGIN" && l.Result == "SUCCESS" && l.CreatedAt >= today);
         ViewBag.FailedToday   = await _context.AuditLogs

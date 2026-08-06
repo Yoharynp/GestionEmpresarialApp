@@ -38,6 +38,14 @@ namespace GestionEmpresarialApp.Models
         [ForeignKey("CategoryId")]
         public virtual Category? Category { get; set; }
 
+        [Column("stock_critical")]
+        [Range(0, int.MaxValue)]
+        public int StockCritical { get; set; } = 5;
+
+        [Column("stock_warning")]
+        [Range(0, int.MaxValue)]
+        public int StockWarning { get; set; } = 15;
+
         [Column("status")]
         [StringLength(20)]
         public string Status { get; set; } = "activo";

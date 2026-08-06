@@ -169,3 +169,12 @@ CREATE TABLE IF NOT EXISTS categories (
     created_at  TIMESTAMP DEFAULT NOW()
 );
 ```
+
+## Migración: umbrales de stock por producto
+
+```sql
+ALTER TABLE products
+    ADD COLUMN IF NOT EXISTS stock_critical integer NOT NULL DEFAULT 5,
+    ADD COLUMN IF NOT EXISTS stock_warning  integer NOT NULL DEFAULT 15;
+```
+

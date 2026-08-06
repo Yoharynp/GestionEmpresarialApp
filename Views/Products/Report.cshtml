@@ -5,11 +5,10 @@
     string   generatedBy = ViewBag.GeneratedBy ?? "";
     int      total       = Model.Count();
     int      activos     = Model.Count(p => p.Status == "activo");
-    int      sinStock    = Model.Count(p => p.Stock <= 0);
+    int      sinStock    = Model.Count(p => p.Stock <= p.StockCritical);
     decimal  valorTotal  = Model.Sum(p => p.Price * p.Stock);
     var      culture     = new System.Globalization.CultureInfo("es-DO");
-    int      threshCrit  = (int)(ViewBag.ThresholdCritical ?? 5);
-    int      threshWarn  = (int)(ViewBag.ThresholdWarning  ?? 15);
+    int      stockCritCount = Model.Count(p => p.Stock <= p.StockCritical);
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -201,7 +200,7 @@
             <div class="summary-card-value">@activos</div>
         </div>
         <div class="summary-card red">
-            <div class="summary-card-label">Sin Stock</div>
+            <div class="summary-card-label">Stock Crítico</div>
             <div class="summary-card-value">@sinStock</div>
         </div>
         <div class="summary-card gray">
@@ -228,7 +227,7 @@
                 @{ int i = 1; }
                 @foreach (var p in Model)
                 {
-                    string stockClass = p.Stock <= 0 ? "stock-zero" : (p.Stock <= threshCrit ? "stock-low" : (p.Stock <= threshWarn ? "stock-warn" : "stock-ok"));
+                    string stockClass = p.Stock <= 0 ? "stock-zero" : (p.Stock <= p.StockCritical ? "stock-low" : (p.Stock <= p.StockWarning ? "stock-warn" : "stock-ok"));
                     <tr>
                         <td class="num-col">@(i++)</td>
                         <td class="font-mono">@p.Code</td>
