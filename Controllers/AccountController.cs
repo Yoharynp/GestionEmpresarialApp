@@ -47,6 +47,23 @@ namespace GestionEmpresarialApp.Controllers
 
             if (usuarioDb != null)
             {
+                if (usuarioDb.Status == "inactivo")
+                {
+                    _context.AuditLogs.Add(new AuditLog
+                    {
+                        UserId    = usuarioDb.UsuarioId,
+                        Username  = usuarioDb.Username,
+                        Action    = "LOGIN_BLOCKED",
+                        Result    = "FAILED",
+                        IpAddress = ip
+                    });
+                    await _context.SaveChangesAsync();
+
+                    ViewBag.Error    = "Su cuenta ha sido desactivada. Contacte al administrador.";
+                    ViewBag.Username = username;
+                    return View();
+                }
+
                 var perms = await _context.RolePermissions
                     .Where(rp => rp.RolId == usuarioDb.RolId)
                     .Select(rp => rp.Permission)
