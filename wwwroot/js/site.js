@@ -1,13 +1,7 @@
-// Normalize text for accent- and case-insensitive comparison
 function normalizeText(s) {
     return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
 
-// Wire real-time client-side search on a table (no page reload).
-// inputId   — id of the search <input>
-// tableId   — id of the <table>
-// countId   — id of the counter element (optional)
-// countWord — label word, e.g. 'clientes'
 function wireTableSearch(inputId, tableId, countId, countWord) {
     var input = document.getElementById(inputId);
     var tbody = document.querySelector('#' + tableId + ' tbody');
@@ -18,7 +12,6 @@ function wireTableSearch(inputId, tableId, countId, countWord) {
         var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
         var visible = 0;
         rows.forEach(function (row) {
-            // empty-state row (single spanning cell) — always show when term is empty
             if (row.cells.length <= 1) {
                 row.style.display = term ? 'none' : '';
                 return;
@@ -28,7 +21,6 @@ function wireTableSearch(inputId, tableId, countId, countWord) {
             row.style.display = show ? '' : 'none';
             if (show) visible++;
         });
-        // update empty-state row visibility
         rows.forEach(function (row) {
             if (row.cells.length <= 1) row.style.display = (visible === 0 ? '' : 'none');
         });
@@ -39,13 +31,11 @@ function wireTableSearch(inputId, tableId, countId, countWord) {
     }
 
     input.addEventListener('input', doFilter);
-    // Prevent Enter from submitting any parent form
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') e.preventDefault();
     });
 }
 
-// Formats a local RD 10-digit block as (XXX)-XXX-XXXX
 function formatLocalBlock(digits) {
     var d = digits.substring(0, 10);
     if (d.length <= 3)  return '(' + d;
@@ -53,11 +43,6 @@ function formatLocalBlock(digits) {
     return '(' + d.substring(0,3) + ')-' + d.substring(3,6) + '-' + d.substring(6);
 }
 
-// Formats a phone number following RD conventions:
-//   - starts with 8        → local RD: (809)-XXX-XXXX
-//   - starts with 1 + 10d  → +1 (809)-XXX-XXXX
-//   - starts with other CC → +CC (XXX)-XXX-XXXX  (if last 10 starts with 8)
-//   - short non-8 prefix   → +CC (typing in progress)
 function formatPhone(raw) {
     var digits = raw.replace(/\D/g, '');
     if (!digits) return '';
@@ -73,11 +58,9 @@ function formatPhone(raw) {
         return '+' + cc + ' ' + formatLocalBlock(local);
     }
 
-    // Country code still being typed
     return '+' + digits;
 }
 
-// Attach formatter to all inputs with data-phone attribute
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('input[data-phone]').forEach(function (input) {
         input.addEventListener('input', function () {

@@ -63,6 +63,7 @@ html[data-theme="dark"] {
     --amber-100:#451A03;
     --blue-100-opacity: rgba(96, 165, 250, 0.15);
     --blue-800-30: rgba(59, 130, 246, 0.3);
+    --blue-900: #BFDBFE;
 }
 
 @font-face {
